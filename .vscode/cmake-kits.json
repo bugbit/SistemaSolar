@@ -1,0 +1,6 @@
+[
+    {
+        "name": "Emscripten",
+        "toolchainFile": "/home/oscar/emsdk/upstream/emscripten/cmake/Modules/Platform/Emscripten.cmake"
+    }
+]
