@@ -1,6 +1,30 @@
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 https://webgl2fundamentals.org/webgl/lessons/webgl-fundamentals.html
 
-
+https://gist.github.com/mortennobel/0e9e90c9bbc61cc99d5c3e9c038d8115
 Lines:
 
 https://solarianprogrammer.com/2013/05/13/opengl-101-drawing-primitives/
