@@ -132,7 +132,7 @@ GLuint LoadShader(GLenum type, const char *shaderSrc)
     GLint compiled;
 
     shader = glCreateShader(type);
-    if (shader == 0)
+    if (!shader)
         return 0;
 
     glShaderSource(shader, 1, &shaderSrc, NULL);
@@ -159,20 +159,20 @@ GLuint LoadShaderFromFile(GLenum type, const char *filePath)
 {
     std::string src = readFile(filePath);
 
-    return LoadShader(type, src.c_str());
+    return (src == "") ? 0 : LoadShader(type, src.c_str());
 }
 
 GLuint LoadShaderFromFile(const char *vertex_path, const char *fragment_path)
 {
     GLuint vertexShader = LoadShaderFromFile(GL_VERTEX_SHADER, vertex_path);
 
-    if (vertexShader <= 0)
+    if (!vertexShader)
         return 0;
 
     // vertexShader = gldr::LoadShader(GL_VERTEX_SHADER, vShaderStr2);
     GLuint fragmentShader = LoadShaderFromFile(GL_FRAGMENT_SHADER, fragment_path);
 
-    if (fragmentShader < 0)
+    if (!fragmentShader)
         return 0;
 
     GLuint programObject = glCreateProgram();
