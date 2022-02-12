@@ -169,4 +169,24 @@ protected:
     }
 };
 
+class Simple2ShaderProgram : public ShaderProgram
+{
+public:
+    inline Simple2ShaderProgram() : ShaderProgram(), vPositionAttribLocation(0) {}
+
+    inline GLuint GetIndexVPosition() const
+    {
+        return vPositionAttribLocation;
+    }
+
+protected:
+    GLuint vPositionAttribLocation;
+
+    inline virtual void initData()
+    {
+        ShaderProgram::initData();
+        vPositionAttribLocation = glGetAttribLocation(program, "vPosition");
+    }
+};
+
 #endif
