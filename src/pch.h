@@ -2,6 +2,8 @@
 #include <iostream>
 #include <fstream>
 #include <vector>
+#include <SDL2/SDL.h>
+#include <SDL2/SDL_image.h>
 #ifdef __EMSCRIPTEN__
 #include <emscripten.h>
 #define GL_GLEXT_PROTOTYPES

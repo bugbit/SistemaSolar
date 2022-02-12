@@ -1,13 +1,12 @@
-#include <iostream>
-
 #include "shaders.h"
+#include "texture.h"
 
 #define BUFFER_OFFSET(offset) ((void *)(offset))
 
 // Un arreglo de 3 vectores que representan 3 vértices
 // static const NodePoints g_vertex_buffer_data = {
 // static const float g_vertex_buffer_data[] = {
-static const GLfloat triangle0[] =
+static const GLfloat triangle[] =
     {
         -0.9f,
         -0.9f,
@@ -17,11 +16,29 @@ static const GLfloat triangle0[] =
         -0.9f,
 };
 
-GLFWwindow *window;
-SimpleShaderProgram simpleGLSL;
-GLuint triangleVAO;
+static const GLfloat rectangle[] =
+    {
+        0.0,
+        0.0,
+        1.0,
+        0.0,
+        0.0,
+        1.0,
+        0.0,
+        1.0,
+        1.0,
+        0.0,
+        1.0,
+        1.0,
+};
+
+static GLFWwindow *window;
+static SimpleShaderProgram simpleGLSL;
+static Texture2d texture;
+static GLuint rectangleVAO;
 
 static GLboolean initGL();
+static void terminate();
 static void terminateGL();
 void main_loop();
 
@@ -89,18 +106,22 @@ int main(int, char **)
 #else
         while (!glfwWindowShouldClose(window))
             main_loop();
+
+        terminate();
+
 #endif
     }
-
-    glfwTerminate();
-
-    terminateGL();
+    else
+        terminate();
 
     return EXIT_SUCCESS;
 }
 
 static GLboolean initGL()
 {
+    if (!texture.load("assets/Tierra2k.jpg"))
+        return GL_FALSE;
+
     if (!simpleGLSL.createProgramFromFile("assets/simple.vs", "assets/simple.fs"))
         return GL_FALSE;
 
@@ -112,7 +133,7 @@ static GLboolean initGL()
     glGenBuffers(1, &vbos);
 
     glBindBuffer(GL_ARRAY_BUFFER, vbos);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(triangle0), triangle0, GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(rectangle), rectangle, GL_STATIC_DRAW);
     glVertexAttribPointer(simpleGLSL.GetIndexVPosition(), 2, GL_FLOAT, GL_FALSE, 0, BUFFER_OFFSET(0));
     glEnableVertexAttribArray(simpleGLSL.GetIndexVPosition());
 
@@ -120,7 +141,7 @@ static GLboolean initGL()
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
-    triangleVAO = vao;
+    rectangleVAO = vao;
 
     return GL_TRUE;
 }
@@ -128,6 +149,14 @@ static GLboolean initGL()
 static void terminateGL()
 {
     simpleGLSL.Delete();
+    texture.Delete();
+}
+
+static void terminate()
+{
+    glfwTerminate();
+
+    terminateGL();
 }
 
 void main_loop()
@@ -142,9 +171,9 @@ void main_loop()
     glClearColor(0, 0, 0, 1.0);
     glClear(GL_COLOR_BUFFER_BIT);
 
-    glBindVertexArray(triangleVAO);
+    glBindVertexArray(rectangleVAO);
     simpleGLSL.Use();
-    glDrawArrays(GL_TRIANGLES, 0, 3);
+    glDrawArrays(GL_TRIANGLES, 0, 3 + 3);
 
     glfwSwapBuffers(window);
 

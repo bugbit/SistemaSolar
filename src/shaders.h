@@ -17,8 +17,11 @@ public:
         for (auto shader : shaders)
             glDeleteShader(shader);
         shaders.clear();
-        glDeleteProgram(program);
-        program = 0;
+        if (program)
+        {
+            glDeleteProgram(program);
+            program = 0;
+        }
     }
 
     inline GLuint loadShader(GLenum type, const char *shaderSrc)

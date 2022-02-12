@@ -31,10 +31,10 @@ if (EMSCRIPTEN)
         ssolar
         PROPERTIES
         LINK_FLAGS
-        "-s USE_GLFW=3 -s USE_WEBGL2=1  --preload-file ../assets@assets"
+        "-s USE_GLFW=3 -s USE_WEBGL2=1 -s USE_SDL=2 -s USE_SDL_IMAGE=2 -s SDL2_IMAGE_FORMATS='["jpg"]' --preload-file ../assets@assets"
     )
 else(EMSCRIPTEN)
-    target_link_libraries(ssolar glfw GL GLEW)
+    target_link_libraries(ssolar glfw GL GLEW SDL2 SDL2main SDL2_image)
     
 endif(EMSCRIPTEN)
 

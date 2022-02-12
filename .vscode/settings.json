@@ -1,3 +1,6 @@
 {
-    "liveServer.settings.root": "build"
+    "liveServer.settings.root": "build",
+    "files.associations": {
+        "iostream": "cpp"
+    }
 }
