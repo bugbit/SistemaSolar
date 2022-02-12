@@ -1,12 +1,29 @@
 #include <iostream>
 
-GLFWwindow *window;
+#include "shaders.h"
 
+#define BUFFER_OFFSET(offset) ((void *)(offset))
+
+// Un arreglo de 3 vectores que representan 3 vértices
+// static const NodePoints g_vertex_buffer_data = {
+// static const float g_vertex_buffer_data[] = {
+static const GLfloat triangle0[] =
+    {
+        -0.9f,
+        -0.9f,
+        0.0f,
+        0.9f,
+        0.9f,
+        -0.9f,
+};
+
+GLFWwindow *window;
+SimpleShaderProgram simpleGLSL;
+GLuint triangleVAO;
+
+static GLboolean initGL();
+static void terminateGL();
 void main_loop();
-std::string readFile(const char *filePath);
-GLuint LoadShader(GLenum type, const char *shaderSrc);
-GLuint LoadShaderFromFile(GLenum type, const char *filePath);
-GLuint LoadShaderFromFile(const char *vertex_path, const char *fragment_path);
 
 int main(int, char **)
 {
@@ -65,24 +82,52 @@ int main(int, char **)
     }
 #endif
 
-    // init
-
-    GLuint program = LoadShaderFromFile("assets/simple.fs", "assets/simple.vs");
-
-    // destroy
-
-    glDeleteProgram(program);
-
+    if (initGL())
+    {
 #ifdef __EMSCRIPTEN__
-    emscripten_set_main_loop(main_loop, 0, true);
+        emscripten_set_main_loop(main_loop, 0, true);
 #else
-    while (!glfwWindowShouldClose(window))
-        main_loop();
+        while (!glfwWindowShouldClose(window))
+            main_loop();
 #endif
+    }
 
     glfwTerminate();
 
+    terminateGL();
+
     return EXIT_SUCCESS;
+}
+
+static GLboolean initGL()
+{
+    if (!simpleGLSL.createProgramFromFile("assets/simple.vs", "assets/simple.fs"))
+        return GL_FALSE;
+
+    GLuint vao;
+    glGenVertexArrays(1, &vao);
+    glBindVertexArray(vao);
+
+    GLuint vbos;
+    glGenBuffers(1, &vbos);
+
+    glBindBuffer(GL_ARRAY_BUFFER, vbos);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(triangle0), triangle0, GL_STATIC_DRAW);
+    glVertexAttribPointer(simpleGLSL.GetIndexVPosition(), 2, GL_FLOAT, GL_FALSE, 0, BUFFER_OFFSET(0));
+    glEnableVertexAttribArray(simpleGLSL.GetIndexVPosition());
+
+    glBindVertexArray(0);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+
+    triangleVAO = vao;
+
+    return GL_TRUE;
+}
+
+static void terminateGL()
+{
+    simpleGLSL.Delete();
 }
 
 void main_loop()
@@ -97,85 +142,12 @@ void main_loop()
     glClearColor(0, 0, 0, 1.0);
     glClear(GL_COLOR_BUFFER_BIT);
 
+    glBindVertexArray(triangleVAO);
+    simpleGLSL.Use();
+    glDrawArrays(GL_TRIANGLES, 0, 3);
+
     glfwSwapBuffers(window);
 
     /* Poll for and process events */
     glfwPollEvents();
-}
-
-std::string readFile(const char *filePath)
-{
-    std::string content;
-    std::ifstream fileStream(filePath, std::ios::in);
-
-    if (!fileStream.is_open())
-    {
-        std::cerr << "Could not read file " << filePath << ". File does not exist." << std::endl;
-        return "";
-    }
-
-    std::string line = "";
-    while (!fileStream.eof())
-    {
-        std::getline(fileStream, line);
-        content.append(line + "\n");
-    }
-
-    fileStream.close();
-
-    return content;
-}
-
-GLuint LoadShader(GLenum type, const char *shaderSrc)
-{
-    GLuint shader;
-    GLint compiled;
-
-    shader = glCreateShader(type);
-    if (!shader)
-        return 0;
-
-    glShaderSource(shader, 1, &shaderSrc, NULL);
-    glCompileShader(shader);
-    glGetShaderiv(shader, GL_COMPILE_STATUS, &compiled);
-    if (!compiled)
-    {
-        GLint infoLen = 0;
-        glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &infoLen);
-        if (infoLen > 1)
-        {
-            char *infoLog = static_cast<char *>(malloc(sizeof(char) * infoLen));
-            glGetShaderInfoLog(shader, infoLen, NULL, infoLog);
-            printf("Error compiling shader:\n%s\n", infoLog);
-            free(infoLog);
-        }
-        glDeleteShader(shader);
-        return 0;
-    }
-    return shader;
-}
-
-GLuint LoadShaderFromFile(GLenum type, const char *filePath)
-{
-    std::string src = readFile(filePath);
-
-    return (src == "") ? 0 : LoadShader(type, src.c_str());
-}
-
-GLuint LoadShaderFromFile(const char *vertex_path, const char *fragment_path)
-{
-    GLuint vertexShader = LoadShaderFromFile(GL_VERTEX_SHADER, vertex_path);
-
-    if (!vertexShader)
-        return 0;
-
-    // vertexShader = gldr::LoadShader(GL_VERTEX_SHADER, vShaderStr2);
-    GLuint fragmentShader = LoadShaderFromFile(GL_FRAGMENT_SHADER, fragment_path);
-
-    if (!fragmentShader)
-        return 0;
-
-    GLuint programObject = glCreateProgram();
-
-    return programObject;
 }

@@ -1,6 +1,7 @@
 #include <string>
 #include <iostream>
 #include <fstream>
+#include <vector>
 #ifdef __EMSCRIPTEN__
 #include <emscripten.h>
 #define GL_GLEXT_PROTOTYPES
