@@ -1,7 +1,7 @@
 #include "shaders.h"
 #include "texture.h"
-
-#define BUFFER_OFFSET(offset) ((void *)(offset))
+#include "vao.h"
+#include "camera.h"
 
 // Un arreglo de 3 vectores que representan 3 vértices
 // static const NodePoints g_vertex_buffer_data = {
@@ -16,27 +16,46 @@ static const GLfloat triangle[] =
         -0.9f,
 };
 
+/*
+  -0.5, -0.5, 0.0, 1.0 ,  0.0, 0.0,
+            -0.5,  0.5, 0.0, 1.0 ,  0.0, 1.0,
+            0.5,  0.5, 0.0, 1.0 ,  1.0, 1.0,
+            0.5, -0.5, 0.0, 1.0 ,  1.0, 0.0,
+*/
+
 static const GLfloat rectangle[] =
+    {
+        -0.5,
+        -0.5,
+        -0.5,
+        0.5,
+        0.5,
+        0.5,
+        0.5,
+        -0.5,
+};
+
+static const GLfloat rectangle_uv[] =
     {
         0.0,
         0.0,
-        1.0,
-        0.0,
-        0.0,
-        1.0,
         0.0,
         1.0,
         1.0,
+        1.0,
+        1.0,
         0.0,
-        1.0,
-        1.0,
 };
 
 static GLFWwindow *window;
-static SimpleShaderProgram simpleGLSL;
+static Camera camera;
+static ShaderProgram simpleGLSL;
 static Texture2d texture;
 static GLuint rectangleVAO;
+static VAO sphereVAO;
+static GLsizei sphereNumIdxs;
 
+static void resizeGL();
 static GLboolean initGL();
 static void terminate();
 static void terminateGL();
@@ -99,6 +118,8 @@ int main(int, char **)
     }
 #endif
 
+    resizeGL();
+
     if (initGL())
     {
 #ifdef __EMSCRIPTEN__
@@ -117,25 +138,43 @@ int main(int, char **)
     return EXIT_SUCCESS;
 }
 
+static void resizeGL()
+{
+    int width, height;
+
+    glfwGetWindowSize(window, &width, &height);
+
+    camera.Viewport(0, 0, width, height);
+    camera.SetProjectionRH(30.0f, width / (float)height, 0.1f, 200.0f);
+}
+
 static GLboolean initGL()
 {
     if (!texture.load("assets/Tierra2k.jpg"))
         return GL_FALSE;
 
-    if (!simpleGLSL.createProgramFromFile("assets/simple.vs", "assets/simple.fs"))
+    if (!simpleGLSL.createProgramFromFile("assets/simple2.vs", "assets/simple2.fs"))
+        return GL_FALSE;
+
+    if (!sphereVAO.MakeSolidSphere(1, 32, 32, sphereNumIdxs))
         return GL_FALSE;
 
     GLuint vao;
     glGenVertexArrays(1, &vao);
     glBindVertexArray(vao);
 
-    GLuint vbos;
-    glGenBuffers(1, &vbos);
+    GLuint vbos[2];
+    glGenBuffers(2, vbos);
 
-    glBindBuffer(GL_ARRAY_BUFFER, vbos);
+    glBindBuffer(GL_ARRAY_BUFFER, vbos[0]);
     glBufferData(GL_ARRAY_BUFFER, sizeof(rectangle), rectangle, GL_STATIC_DRAW);
-    glVertexAttribPointer(simpleGLSL.GetIndexVPosition(), 2, GL_FLOAT, GL_FALSE, 0, BUFFER_OFFSET(0));
-    glEnableVertexAttribArray(simpleGLSL.GetIndexVPosition());
+    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 0, BUFFER_OFFSET(0));
+    glEnableVertexAttribArray(0);
+
+    glBindBuffer(GL_ARRAY_BUFFER, vbos[1]);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(rectangle_uv), rectangle_uv, GL_STATIC_DRAW);
+    glVertexAttribPointer(8, 2, GL_FLOAT, GL_FALSE, 0, BUFFER_OFFSET(0));
+    glEnableVertexAttribArray(8);
 
     glBindVertexArray(0);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
@@ -161,19 +200,17 @@ static void terminate()
 
 void main_loop()
 {
-    int width, height;
-    glfwGetWindowSize(window, &width, &height);
-
-    glViewport(0, 0, width, height);
-
     /* Choose background color */
     // glClearColor(1.0, 0.0, 1.0, 1.0);
     glClearColor(0, 0, 0, 1.0);
     glClear(GL_COLOR_BUFFER_BIT);
 
-    glBindVertexArray(rectangleVAO);
+    // glBindVertexArray(rectangleVAO);
+    glBindVertexArray(sphereVAO.getVAO());
+    texture.BindTexture();
     simpleGLSL.Use();
-    glDrawArrays(GL_TRIANGLES, 0, 3 + 3);
+    // glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
+    glDrawElements(GL_TRIANGLES, sphereNumIdxs, GL_UNSIGNED_INT, BUFFER_OFFSET(0));
 
     glfwSwapBuffers(window);
 

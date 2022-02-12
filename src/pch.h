@@ -2,6 +2,9 @@
 #include <iostream>
 #include <fstream>
 #include <vector>
+#define _USE_MATH_DEFINES
+#include <math.h>
+#include <assert.h>
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
 #ifdef __EMSCRIPTEN__
@@ -13,3 +16,5 @@
 #include <GL/glew.h>
 #endif
 #include <GLFW/glfw3.h>
+#include "glm.hpp"
+#include "gtx/transform.hpp"
