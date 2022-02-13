@@ -1,6 +1,7 @@
 #version 300 es
 precision highp float;
 layout(location=0) in vec3 iPosition; 
+layout(location=8) in vec2 iTexcoord;
 out vec2 oTexcoord;
 
 // Model, View, Projection matrix.

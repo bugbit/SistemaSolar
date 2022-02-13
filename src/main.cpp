@@ -2,6 +2,7 @@
 #include "texture.h"
 #include "vao.h"
 #include "camera.h"
+#include "astro.h"
 
 // Un arreglo de 3 vectores que representan 3 vértices
 // static const NodePoints g_vertex_buffer_data = {
@@ -49,14 +50,18 @@ static const GLfloat rectangle_uv[] =
 
 static GLFWwindow *window;
 static Camera camera;
-static ShaderProgram simpleGLSL;
+static glm::vec3 obsPos(100, 0, 0), obsCenter(0, 0, 0), obsUp(0, 1, 0);
+static PlanetShaderProgram simpleGLSL;
 static Texture2d texture;
 static GLuint rectangleVAO;
 static VAO sphereVAO;
 static GLsizei sphereNumIdxs;
+static Estrella *sol;
 
 static void resizeGL();
 static GLboolean initGL();
+static GLboolean init();
+static GLboolean initAstros();
 static void terminate();
 static void terminateGL();
 void main_loop();
@@ -122,18 +127,23 @@ int main(int, char **)
 
     if (initGL())
     {
+        if (init)
+        {
 #ifdef __EMSCRIPTEN__
-        emscripten_set_main_loop(main_loop, 0, true);
+            emscripten_set_main_loop(main_loop, 0, true);
 #else
-        while (!glfwWindowShouldClose(window))
-            main_loop();
+            while (!glfwWindowShouldClose(window))
+                main_loop();
 
-        terminate();
-
+            terminateGL();
+            terminate();
 #endif
+        }
+        else
+            terminate();
     }
     else
-        terminate();
+        terminateGL();
 
     return EXIT_SUCCESS;
 }
@@ -144,16 +154,16 @@ static void resizeGL()
 
     glfwGetWindowSize(window, &width, &height);
 
-    camera.Viewport(0, 0, width, height);
-    camera.SetProjectionRH(30.0f, width / (float)height, 0.1f, 200.0f);
+    camera.viewport(0, 0, width, height);
+    camera.setProjectionRH(30.0f, width / (float)height, 0.1f, 200.0f);
 }
 
 static GLboolean initGL()
 {
-    if (!texture.load("assets/Tierra2k.jpg"))
+    if (!texture.load("assets/textures/2k_sun.jpg"))
         return GL_FALSE;
 
-    if (!simpleGLSL.createProgramFromFile("assets/simple2.vs", "assets/simple2.fs"))
+    if (!simpleGLSL.createProgramFromFile("assets/shaders/planet.vs", "assets/shaders/planet.fs"))
         return GL_FALSE;
 
     if (!sphereVAO.MakeSolidSphere(1, 32, 32, sphereNumIdxs))
@@ -185,6 +195,19 @@ static GLboolean initGL()
     return GL_TRUE;
 }
 
+static GLboolean init()
+{
+    if (!initAstros())
+        return GL_FALSE;
+
+    return GL_TRUE;
+}
+
+static GLboolean initAstros()
+{
+    //sol=new Estrella();
+    return GL_TRUE;
+}
 static void terminateGL()
 {
     simpleGLSL.Delete();
@@ -193,9 +216,13 @@ static void terminateGL()
 
 static void terminate()
 {
+    if (sol)
+    {
+        delete sol;
+        
+        sol=NULL;
+    }
     glfwTerminate();
-
-    terminateGL();
 }
 
 void main_loop()
@@ -204,6 +231,9 @@ void main_loop()
     // glClearColor(1.0, 0.0, 1.0, 1.0);
     glClearColor(0, 0, 0, 1.0);
     glClear(GL_COLOR_BUFFER_BIT);
+
+    camera.lookUp(obsPos, obsCenter, obsUp);
+    simpleGLSL.setMVP(camera.getProjectionMatrix() * camera.getviewMatrix());
 
     // glBindVertexArray(rectangleVAO);
     glBindVertexArray(sphereVAO.getVAO());

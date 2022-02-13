@@ -63,4 +63,26 @@ protected:
     }
 };
 
+class PlanetShaderProgram : public ShaderProgram
+{
+public:
+    PlanetShaderProgram() : ShaderProgram(), MVPUniform(-1)
+    {
+    }
+
+    inline void setMVP(glm::mat4 mvp)
+    {
+        glUniformMatrix4fv(MVPUniform, 1, GL_FALSE, glm::value_ptr(mvp));
+    }
+
+protected:
+    // Model, View, Projection matrix uniform variable in shader program.
+    GLint MVPUniform;
+
+    inline virtual void initData()
+    {
+        MVPUniform = glGetUniformLocation(program, "MVP");
+    }
+};
+
 #endif

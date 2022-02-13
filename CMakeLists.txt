@@ -6,7 +6,7 @@ if (EMSCRIPTEN)
     #set(CMAKE_C_FLAGS "-s STANDALONE_WASM" )
 endif()
 
-include_directories(extern/glm)
+include_directories(extern)
 
 include(CTest)
 enable_testing()
