@@ -48,37 +48,12 @@ static const GLfloat rectangle_uv[] =
         0.0,
 };
 
-static const GLfloat stars_pos[] =
-    {
-        -1,
-        -1,
-        -1,
-        1,
-        1,
-        1,
-        1,
-        -1,
-};
-
-static const GLfloat stars_uv[] =
-    {
-        0.0,
-        0.0,
-        0.0,
-        1.0,
-        1.0,
-        1.0,
-        1.0,
-        0.0,
-};
-
 static GLFWwindow *window;
 static Camera camera;
 static glm::vec3 obsPos(100, 0, 0), obsCenter(0, 0, 0), obsUp(0, 1, 0);
-static ShaderProgram starGLSL;
 static PlanetShaderProgram planetGLSL;
-static Texture2d stars_tex, texture;
-static GLuint starsVAO;
+static Texture2d texture;
+static GLuint rectangleVAO;
 static VAO sphereVAO;
 static GLsizei sphereNumIdxs;
 static Estrella *sol;
@@ -186,13 +161,7 @@ static void resizeGL()
 
 static GLboolean initGL()
 {
-    if (!stars_tex.load("assets/textures/2k_stars+milky_way.jpg"))
-        return GL_FALSE;
-
     if (!texture.load("assets/textures/2k_sun.jpg"))
-        return GL_FALSE;
-
-    if (!starGLSL.createProgramFromFile("assets/shaders/stars.vs", "assets/shaders/stars.fs"))
         return GL_FALSE;
 
     if (!planetGLSL.createProgramFromFile("assets/shaders/planet.vs", "assets/shaders/planet.fs"))
@@ -209,12 +178,12 @@ static GLboolean initGL()
     glGenBuffers(2, vbos);
 
     glBindBuffer(GL_ARRAY_BUFFER, vbos[0]);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(stars_pos), stars_pos, GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(rectangle), rectangle, GL_STATIC_DRAW);
     glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 0, BUFFER_OFFSET(0));
     glEnableVertexAttribArray(0);
 
     glBindBuffer(GL_ARRAY_BUFFER, vbos[1]);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(stars_uv), stars_uv, GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(rectangle_uv), rectangle_uv, GL_STATIC_DRAW);
     glVertexAttribPointer(8, 2, GL_FLOAT, GL_FALSE, 0, BUFFER_OFFSET(0));
     glEnableVertexAttribArray(8);
 
@@ -222,7 +191,7 @@ static GLboolean initGL()
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
-    starsVAO = vao;
+    rectangleVAO = vao;
 
     return GL_TRUE;
 }
@@ -237,7 +206,7 @@ static GLboolean init()
 
 static GLboolean initAstros()
 {
-    // sol=new Estrella();
+    //sol=new Estrella();
     return GL_TRUE;
 }
 static void terminateGL()
@@ -251,18 +220,15 @@ static void terminate()
     if (sol)
     {
         delete sol;
-
-        sol = NULL;
+        
+        sol=NULL;
     }
     glfwTerminate();
 }
 
 void main_loop()
 {
-    displayGL();
-
-    /*
-
+    /* Choose background color */
     // glClearColor(1.0, 0.0, 1.0, 1.0);
     glClearColor(0, 0, 0, 1.0);
     glClear(GL_COLOR_BUFFER_BIT);
@@ -277,8 +243,6 @@ void main_loop()
     // glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
     glDrawElements(GL_TRIANGLES, sphereNumIdxs, GL_UNSIGNED_INT, BUFFER_OFFSET(0));
 
-    */
-
     glfwSwapBuffers(window);
 
     /* Poll for and process events */
@@ -287,13 +251,10 @@ void main_loop()
 
 static void displayGL()
 {
-    /* Choose background color */
+     /* Choose background color */
     // glClearColor(1.0, 0.0, 1.0, 1.0);
     glClearColor(0, 0, 0, 1.0);
     glClear(GL_COLOR_BUFFER_BIT);
 
-    glBindVertexArray(starsVAO);
-    stars_tex.BindTexture();
-    starGLSL.Use();
-    glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
+    glBindVertexArray(rectangleVAO);
 }

@@ -9,7 +9,7 @@ class Camera;
 class Astro
 {
 public:
-    inline Astro(ShaderProgram &shader, VAO &vao, glm::float32 radio) : shader(shader), vao(vao), radio(radio)
+    inline Astro(glm::float32 radio) : radio(radio)
     {
     }
     inline virtual void DisplayGL(Camera &camera)
@@ -17,21 +17,20 @@ public:
     }
 
 protected:
-    ShaderProgram &shader;
-    VAO &vao;
     glm::float32 radio;
+    glm::vec3 position;
     glm::mat4 modelMatrix;
 };
 
 class Estrella : public Astro
 {
 public:
-    Estrella(ShaderProgram &shader, VAO &vao, glm::float32 radio, glm::vec3 position) : Astro(shader, vao, radio), position(position)
+    Estrella(glm::float32 radio, glm::vec3 position) : Astro(radio)
     {
+        Astro::position = position;
     }
 
 protected:
-    glm::vec3 position;
 };
 
 #endif
