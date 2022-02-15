@@ -77,11 +77,11 @@ static Camera camera;
 static glm::vec3 obsPos(100, 0, 0), obsCenter(0, 0, 0), obsUp(0, 1, 0);
 static ShaderProgram starGLSL;
 static PlanetShaderProgram planetGLSL;
-static Texture2d stars_tex, texture;
+static Texture2d stars_tex /*, texture*/;
 static GLuint starsVAO;
 static VAO sphereVAO;
 static GLsizei sphereNumIdxs;
-static Estrella *sol;
+static Estrella sol(ASTROS_OPTS_SHADERS::Planet, "sol", "2k_sun.jpg", 109 / 20, glm::vec3(0, 0, 0));
 
 static void resizeGL();
 static GLboolean initGL();
@@ -189,8 +189,8 @@ static GLboolean initGL()
     if (!stars_tex.load("assets/textures/2k_stars+milky_way.jpg"))
         return GL_FALSE;
 
-    if (!texture.load("assets/textures/2k_sun.jpg"))
-        return GL_FALSE;
+    // if (!texture.load("assets/textures/2k_sun.jpg"))
+    //     return GL_FALSE;
 
     if (!starGLSL.createProgramFromFile("assets/shaders/stars.vs", "assets/shaders/stars.fs"))
         return GL_FALSE;
@@ -224,6 +224,9 @@ static GLboolean initGL()
 
     starsVAO = vao;
 
+    if (!sol.initGL())
+        return GL_FALSE;
+
     return GL_TRUE;
 }
 
@@ -243,17 +246,17 @@ static GLboolean initAstros()
 static void terminateGL()
 {
     planetGLSL.Delete();
-    texture.Delete();
+    // texture.Delete();
 }
 
 static void terminate()
 {
-    if (sol)
-    {
-        delete sol;
+    // if (sol)
+    // {
+    //     delete sol;
 
-        sol = NULL;
-    }
+    //     sol = NULL;
+    // }
     glfwTerminate();
 }
 
@@ -279,6 +282,10 @@ void main_loop()
 
     */
 
+    glBindVertexArray(0);
+    glUseProgram(0);
+    glBindTexture(GL_TEXTURE_2D, 0);
+
     glfwSwapBuffers(window);
 
     /* Poll for and process events */
@@ -296,4 +303,11 @@ static void displayGL()
     stars_tex.BindTexture();
     starGLSL.Use();
     glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
+
+    camera.lookUp(obsPos, obsCenter, obsUp);
+    glBindVertexArray(sphereVAO.getVAO());
+    sol.getTexture().BindTexture();
+    planetGLSL.Use();
+    planetGLSL.setMVP(camera.getProjectionMatrix() * camera.getviewMatrix() * sol.getModelMatrix());
+    glDrawElements(GL_TRIANGLES, sphereNumIdxs, GL_UNSIGNED_INT, BUFFER_OFFSET(0));
 }
