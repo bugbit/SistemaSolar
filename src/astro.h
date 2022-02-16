@@ -18,7 +18,8 @@ public:
         : shader(shader), name(name), filetex(filetex), radius(radius), position(position)
     {
     }
-    inline virtual void displayGL(Camera &camera)
+    inline Astro(ASTROS_OPTS_SHADERS shader, const char *name, const char *filetex, glm::float32 radius)
+        : shader(shader), name(name), filetex(filetex), radius(radius), position()
     {
     }
 
@@ -44,18 +45,54 @@ protected:
     Texture2d texture;
 };
 
+class Estrella;
+
+class AstroConOrbita : public Astro
+{
+public:
+    AstroConOrbita(ASTROS_OPTS_SHADERS shader, const char *name, const char *filetex, glm::float32 radius)
+        : Astro(shader, name, filetex, radius), astroCentro(NULL)
+    {
+    }
+
+    inline void setAstroCentro(Astro *astro)
+    {
+        this->astroCentro = astro;
+    }
+
+protected:
+    Astro *astroCentro;
+};
+
+class Planeta : public AstroConOrbita
+{
+public:
+    Planeta(ASTROS_OPTS_SHADERS shader, const char *name, const char *filetex, glm::float32 radius)
+        : AstroConOrbita(shader, name, filetex, radius)
+    {
+    }
+
+protected:
+};
+
 class Estrella : public Astro
 {
 public:
     Estrella(ASTROS_OPTS_SHADERS shader, const char *name, const char *filetex, glm::float32 radius, glm::vec3 position)
-        : Astro(shader, name, filetex, radius, position)
+        : Astro(shader, name, filetex, radius, position), planetas()
     {
-        Astro::position = position;
+    }
+
+    inline void add(Planeta *planeta)
+    {
+        planeta->setAstroCentro(this);
+        planetas.push_back(planeta);
     }
 
     virtual bool initGL();
 
 protected:
+    std::vector<Planeta *> planetas;
 };
 
 #endif

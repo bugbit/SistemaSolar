@@ -82,6 +82,7 @@ static GLuint starsVAO;
 static VAO sphereVAO;
 static GLsizei sphereNumIdxs;
 static Estrella sol(ASTROS_OPTS_SHADERS::Planet, "sol", "2k_sun.jpg", 109 / 20, glm::vec3(0, 0, 0));
+static Planeta tierra(ASTROS_OPTS_SHADERS::Planet, "tierra", "Tierra2k.jpg", 1);
 
 static void resizeGL();
 static GLboolean initGL();
@@ -91,6 +92,7 @@ static void terminate();
 static void terminateGL();
 void main_loop();
 static void displayGL();
+static void displayAstro(Astro &astro);
 
 int main(int, char **)
 {
@@ -188,9 +190,6 @@ static GLboolean initGL()
 {
     if (!stars_tex.load("assets/textures/2k_stars+milky_way.jpg"))
         return GL_FALSE;
-
-    // if (!texture.load("assets/textures/2k_sun.jpg"))
-    //     return GL_FALSE;
 
     if (!starGLSL.createProgramFromFile("assets/shaders/stars.vs", "assets/shaders/stars.fs"))
         return GL_FALSE;
@@ -299,15 +298,21 @@ static void displayGL()
     glClearColor(0, 0, 0, 1.0);
     glClear(GL_COLOR_BUFFER_BIT);
 
+    camera.lookUp(obsPos, obsCenter, obsUp);
+
     glBindVertexArray(starsVAO);
     stars_tex.BindTexture();
     starGLSL.Use();
     glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
 
-    camera.lookUp(obsPos, obsCenter, obsUp);
+    displayAstro(sol);
+}
+
+static void displayAstro(Astro &astro)
+{
     glBindVertexArray(sphereVAO.getVAO());
-    sol.getTexture().BindTexture();
+    astro.getTexture().BindTexture();
     planetGLSL.Use();
-    planetGLSL.setMVP(camera.getProjectionMatrix() * camera.getviewMatrix() * sol.getModelMatrix());
+    planetGLSL.setMVP(camera.getProjectionMatrix() * camera.getviewMatrix() * astro.getModelMatrix());
     glDrawElements(GL_TRIANGLES, sphereNumIdxs, GL_UNSIGNED_INT, BUFFER_OFFSET(0));
 }
