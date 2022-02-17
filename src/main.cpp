@@ -82,7 +82,7 @@ static GLuint starsVAO;
 static VAO sphereVAO;
 static GLsizei sphereNumIdxs;
 static Estrella sol(ASTROS_OPTS_SHADERS::Planet, "sol", "2k_sun.jpg", 109 / 20, glm::vec3(0, 0, 0));
-static Planeta tierra(ASTROS_OPTS_SHADERS::Planet, "tierra", "Tierra2k.jpg", 1);
+static Planeta tierra(ASTROS_OPTS_SHADERS::Planet, "tierra", "Tierra2k.jpg", 1, 15.19 * 10, 14.95 * 10);
 
 static void resizeGL();
 static GLboolean initGL();
@@ -226,6 +226,9 @@ static GLboolean initGL()
     if (!sol.initGL())
         return GL_FALSE;
 
+    if (!tierra.initGL())
+        return GL_FALSE;
+
     return GL_TRUE;
 }
 
@@ -261,6 +264,8 @@ static void terminate()
 
 void main_loop()
 {
+    tierra.Orbita();
+
     displayGL();
 
     /*
@@ -306,6 +311,7 @@ static void displayGL()
     glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
 
     displayAstro(sol);
+    displayAstro(tierra);
 }
 
 static void displayAstro(Astro &astro)

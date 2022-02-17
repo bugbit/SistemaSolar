@@ -50,8 +50,8 @@ class Estrella;
 class AstroConOrbita : public Astro
 {
 public:
-    AstroConOrbita(ASTROS_OPTS_SHADERS shader, const char *name, const char *filetex, glm::float32 radius)
-        : Astro(shader, name, filetex, radius), astroCentro(NULL)
+    AstroConOrbita(ASTROS_OPTS_SHADERS shader, const char *name, const char *filetex, glm::float32 radius, double aphelion, double perihelion)
+        : Astro(shader, name, filetex, radius), astroCentro(NULL), aphelion(aphelion), perihelion(perihelion), angOrbital(0)
     {
     }
 
@@ -60,15 +60,28 @@ public:
         this->astroCentro = astro;
     }
 
+    virtual bool initGL();
+
+    inline void Orbita()
+    {
+        angOrbital = fmod(angOrbital + M_PI / 180, 2 * M_PI);
+        CalcMVP();
+    }
+
 protected:
     Astro *astroCentro;
+    double aphelion;
+    double perihelion;
+    float angOrbital;
+
+    void CalcMVP();
 };
 
 class Planeta : public AstroConOrbita
 {
 public:
-    Planeta(ASTROS_OPTS_SHADERS shader, const char *name, const char *filetex, glm::float32 radius)
-        : AstroConOrbita(shader, name, filetex, radius)
+    Planeta(ASTROS_OPTS_SHADERS shader, const char *name, const char *filetex, glm::float32 radius, double aphelion, double perihelion)
+        : AstroConOrbita(shader, name, filetex, radius, aphelion, perihelion)
     {
     }
 
