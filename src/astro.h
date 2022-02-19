@@ -25,6 +25,11 @@ public:
 
     virtual bool initGL();
 
+    inline const glm::vec3 &getPosition() const
+    {
+        return position;
+    }
+
     inline const glm::mat4 &getModelMatrix() const
     {
         return modelMatrix;
@@ -50,8 +55,8 @@ class Estrella;
 class AstroConOrbita : public Astro
 {
 public:
-    AstroConOrbita(ASTROS_OPTS_SHADERS shader, const char *name, const char *filetex, glm::float32 radius, double aphelion, double perihelion)
-        : Astro(shader, name, filetex, radius), astroCentro(NULL), aphelion(aphelion), perihelion(perihelion), angOrbital(0)
+    AstroConOrbita(ASTROS_OPTS_SHADERS shader, const char *name, const char *filetex, glm::float32 radius, double ejeMayor, double excentricidad)
+        : Astro(shader, name, filetex, radius), astroCentro(NULL), ejeMayor(ejeMayor), excentricidad(excentricidad), center(), angOrbital(0)
     {
     }
 
@@ -70,8 +75,12 @@ public:
 
 protected:
     Astro *astroCentro;
-    double aphelion;
-    double perihelion;
+    double ejeMayor;
+    double excentricidad;
+    double a; // ejeMayor/2
+    double b; // ejeMenor/2
+    double c; // distancia focaL
+    glm::vec3 center;
     float angOrbital;
 
     void CalcMVP();

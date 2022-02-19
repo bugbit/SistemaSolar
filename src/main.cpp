@@ -74,15 +74,16 @@ static const GLfloat stars_uv[] =
 
 static GLFWwindow *window;
 static Camera camera;
-static glm::vec3 obsPos(100, 0, 0), obsCenter(0, 0, 0), obsUp(0, 1, 0);
+static glm::vec3 obsPos(20, 0, 0), obsCenter(0, 0, 0), obsUp(0, 1, 0);
 static ShaderProgram starGLSL;
 static PlanetShaderProgram planetGLSL;
 static Texture2d stars_tex /*, texture*/;
 static GLuint starsVAO;
 static VAO sphereVAO;
 static GLsizei sphereNumIdxs;
-static Estrella sol(ASTROS_OPTS_SHADERS::Planet, "sol", "2k_sun.jpg", 109 / 20, glm::vec3(0, 0, 0));
-static Planeta tierra(ASTROS_OPTS_SHADERS::Planet, "tierra", "Tierra2k.jpg", 1, 15.19 * 10, 14.95 * 10);
+static double radi_terra = (12756.78) / 2.0d;
+static Estrella sol(ASTROS_OPTS_SHADERS::Planet, "sol", "2k_sun.jpg", ((696000) / radi_terra) / 100.0d, glm::vec3(0, 0, 0));
+static Planeta tierra(ASTROS_OPTS_SHADERS::Planet, "tierra", "Tierra2k.jpg", 0.1, 149503 / 10000.0d, 0.016d);
 
 static void resizeGL();
 static GLboolean initGL();
@@ -214,14 +215,16 @@ static GLboolean initGL()
 
     glBindBuffer(GL_ARRAY_BUFFER, vbos[1]);
     glBufferData(GL_ARRAY_BUFFER, sizeof(stars_uv), stars_uv, GL_STATIC_DRAW);
-    glVertexAttribPointer(8, 2, GL_FLOAT, GL_FALSE, 0, BUFFER_OFFSET(0));
-    glEnableVertexAttribArray(8);
+    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 0, BUFFER_OFFSET(0));
+    glEnableVertexAttribArray(1);
 
     glBindVertexArray(0);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
     starsVAO = vao;
+
+    sol.add(&tierra);
 
     if (!sol.initGL())
         return GL_FALSE;
@@ -305,8 +308,8 @@ static void displayGL()
 
     camera.lookUp(obsPos, obsCenter, obsUp);
 
-    glBindVertexArray(starsVAO);
     stars_tex.BindTexture();
+    glBindVertexArray(starsVAO);
     starGLSL.Use();
     glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
 
@@ -316,8 +319,8 @@ static void displayGL()
 
 static void displayAstro(Astro &astro)
 {
-    glBindVertexArray(sphereVAO.getVAO());
     astro.getTexture().BindTexture();
+    glBindVertexArray(sphereVAO.getVAO());
     planetGLSL.Use();
     planetGLSL.setMVP(camera.getProjectionMatrix() * camera.getviewMatrix() * astro.getModelMatrix());
     glDrawElements(GL_TRIANGLES, sphereNumIdxs, GL_UNSIGNED_INT, BUFFER_OFFSET(0));

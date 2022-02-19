@@ -1,30 +1,11 @@
+EjeMayor (a), EjeMenor (b) Distancia focal (2c): c => centro al foco
+
+c²=a²-b2
 
 La ecuación se puede determinar muy fácilmente utilizando simplemente 2 fórmulas de la elipse - prehelio= semieje mayor × (1 -e) - cuadrado del semieje menor= cuadrado del semieje mayor ( 1-e^2) Aquí e es la excentricidad Por lo tanto, el semieje menor en la resolución = 149,58 millones de Kms. Entonces la ecuación es (X÷149,6)^2 + (Y÷149,58)^2 = 1
- 
 
 
 Fuente: https://www.i-ciencias.com/pregunta/85691/ecuacion-de-la-orbita-de-la-tierra-alrededor-del-sol-elipse
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 https://webgl2fundamentals.org/webgl/lessons/webgl-fundamentals.html
 
