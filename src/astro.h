@@ -55,8 +55,8 @@ class Estrella;
 class AstroConOrbita : public Astro
 {
 public:
-    AstroConOrbita(ASTROS_OPTS_SHADERS shader, const char *name, const char *filetex, glm::float32 radius, double ejeMayor, double excentricidad)
-        : Astro(shader, name, filetex, radius), astroCentro(NULL), ejeMayor(ejeMayor), excentricidad(excentricidad), center(), angOrbital(0)
+    AstroConOrbita(ASTROS_OPTS_SHADERS shader, const char *name, const char *filetex, glm::float32 radius, double ejeMayor, double excentricidad, double peridoOrbital)
+        : Astro(shader, name, filetex, radius), astroCentro(NULL), ejeMayor(ejeMayor), excentricidad(excentricidad), periodoOrbital(peridoOrbital), center(), angOrbital(0)
     {
     }
 
@@ -82,16 +82,20 @@ protected:
     double c; // distancia focaL
     glm::vec3 center;
     float angOrbital;
+    double periodoOrbital; // days
+    double velAngOrbital;  // rad/ms
 
-    void CalcMVP();
+    void
+    CalcMVP();
 };
 
 class Planeta : public AstroConOrbita
 {
 public:
-    Planeta(ASTROS_OPTS_SHADERS shader, const char *name, const char *filetex, glm::float32 radius, double aphelion, double perihelion)
-        : AstroConOrbita(shader, name, filetex, radius, aphelion, perihelion)
+    Planeta(ASTROS_OPTS_SHADERS shader, const char *name, const char *filetex, glm::float32 radius, double ejeMayor, double excentricidad, double peridoOrbital)
+        : AstroConOrbita(shader, name, filetex, radius, ejeMayor, excentricidad, peridoOrbital)
     {
+        velAngOrbital = 2 * M_PI / (peridoOrbital * 24 * 60 * 60 * 1000.0d);
     }
 
 protected:

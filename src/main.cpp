@@ -83,7 +83,7 @@ static VAO sphereVAO;
 static GLsizei sphereNumIdxs;
 static double radi_terra = (12756.78) / 2.0d;
 static Estrella sol(ASTROS_OPTS_SHADERS::Planet, "sol", "2k_sun.jpg", ((696000) / radi_terra) / 100.0d, glm::vec3(0, 0, 0));
-static Planeta tierra(ASTROS_OPTS_SHADERS::Planet, "tierra", "Tierra2k.jpg", 0.1, 149503 / 10000.0d, 0.016d);
+static Planeta tierra(ASTROS_OPTS_SHADERS::Planet, "tierra", "Tierra2k.jpg", 0.1, 149503 / 10000.0d, 0.016d, 365.2d);
 
 static void resizeGL();
 static GLboolean initGL();
