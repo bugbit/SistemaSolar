@@ -72,6 +72,7 @@ static const GLfloat stars_uv[] =
         0.0,
 };
 
+static double scaleTime = 1000000.0d, lastTime;
 static GLFWwindow *window;
 static Camera camera;
 static glm::vec3 obsPos(20, 0, 0), obsCenter(0, 0, 0), obsUp(0, 1, 0);
@@ -84,6 +85,7 @@ static GLsizei sphereNumIdxs;
 static double radi_terra = (12756.78) / 2.0d;
 static Estrella sol(ASTROS_OPTS_SHADERS::Planet, "sol", "2k_sun.jpg", ((696000) / radi_terra) / 100.0d, glm::vec3(0, 0, 0));
 static Planeta tierra(ASTROS_OPTS_SHADERS::Planet, "tierra", "Tierra2k.jpg", 0.1, 149503 / 10000.0d, 0.016d, 365.2d);
+static Planeta venus(ASTROS_OPTS_SHADERS::Planet, "venus", "2k_venus.jpg", 0.1, 108200 / 10000.0d, 0.001d, 224.701d);
 
 static void resizeGL();
 static GLboolean initGL();
@@ -158,6 +160,7 @@ int main(int, char **)
     {
         if (init)
         {
+            lastTime = glfwGetTime();
 #ifdef __EMSCRIPTEN__
             emscripten_set_main_loop(main_loop, 0, true);
 #else
@@ -225,11 +228,15 @@ static GLboolean initGL()
     starsVAO = vao;
 
     sol.add(&tierra);
+    sol.add(&venus);
 
     if (!sol.initGL())
         return GL_FALSE;
 
     if (!tierra.initGL())
+        return GL_FALSE;
+
+    if (!venus.initGL())
         return GL_FALSE;
 
     return GL_TRUE;
@@ -267,7 +274,12 @@ static void terminate()
 
 void main_loop()
 {
-    tierra.Orbita();
+    double _lastTime = glfwGetTime();
+    double ellapse = _lastTime - lastTime;
+
+    lastTime = _lastTime;
+    tierra.Orbita(ellapse * scaleTime);
+    venus.Orbita(ellapse * scaleTime);
 
     displayGL();
 
@@ -315,6 +327,7 @@ static void displayGL()
 
     displayAstro(sol);
     displayAstro(tierra);
+    displayAstro(venus);
 }
 
 static void displayAstro(Astro &astro)

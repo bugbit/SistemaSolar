@@ -58,6 +58,7 @@ public:
     AstroConOrbita(ASTROS_OPTS_SHADERS shader, const char *name, const char *filetex, glm::float32 radius, double ejeMayor, double excentricidad, double peridoOrbital)
         : Astro(shader, name, filetex, radius), astroCentro(NULL), ejeMayor(ejeMayor), excentricidad(excentricidad), periodoOrbital(peridoOrbital), center(), angOrbital(0)
     {
+        velAngOrbital = 2 * M_PI / (peridoOrbital * 24 * 60 * 60);
     }
 
     inline void setAstroCentro(Astro *astro)
@@ -67,9 +68,10 @@ public:
 
     virtual bool initGL();
 
-    inline void Orbita()
+    // ellapse in secs
+    inline void Orbita(double ellapse)
     {
-        angOrbital = fmod(angOrbital + M_PI / 180, 2 * M_PI);
+        angOrbital = fmod(angOrbital + velAngOrbital * ellapse, 2 * M_PI);
         CalcMVP();
     }
 
@@ -83,7 +85,7 @@ protected:
     glm::vec3 center;
     float angOrbital;
     double periodoOrbital; // days
-    double velAngOrbital;  // rad/ms
+    double velAngOrbital;  // rad/s
 
     void
     CalcMVP();
@@ -95,7 +97,6 @@ public:
     Planeta(ASTROS_OPTS_SHADERS shader, const char *name, const char *filetex, glm::float32 radius, double ejeMayor, double excentricidad, double peridoOrbital)
         : AstroConOrbita(shader, name, filetex, radius, ejeMayor, excentricidad, peridoOrbital)
     {
-        velAngOrbital = 2 * M_PI / (peridoOrbital * 24 * 60 * 60 * 1000.0d);
     }
 
 protected:
