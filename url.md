@@ -26,8 +26,10 @@ https://learnopengl.com/Advanced-OpenGL/Geometry-Shader
 https://medium.com/srojas19/profundizaci%C3%B3n-webgl-2-f21d3a7e63d4
 
 https://uncovergame.com/2015/01/21/porting-a-complete-c-game-engine-to-html5-through-emscripten/
+https://stackoverflow.com/questions/64170321/how-to-draw-a-smooth-circle-with-a-border-in-glsl
 
 https://www.3dgep.com/texturing-and-lighting-with-opengl-and-glsl/
+https://medium.com/@keynekassapa13/creating-the-solar-system-opengl-and-c-9d4e4798d759
 https://programmerclick.com/article/60191392793/
 https://www.solarsystemscope.com/textures/
 https://balusoft.wordpress.com/2010/12/17/sistema-solar-con-opengl-delphi-7/
