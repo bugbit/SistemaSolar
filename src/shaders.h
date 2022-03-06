@@ -85,4 +85,53 @@ protected:
     }
 };
 
+class OrbitShaderProgram : public ShaderProgram
+{
+public:
+    OrbitShaderProgram() : ShaderProgram(), centerUniform(-1), aUniform(-1), bUniform(-1), numVertUniform(-1)
+    {
+    }
+
+    inline void setMVP(glm::mat4 mvp)
+    {
+        glUniformMatrix4fv(MVPUniform, 1, GL_FALSE, glm::value_ptr(mvp));
+    }
+
+    inline void setCenter(glm::vec3 &center)
+    {
+        glUniform3fv(centerUniform, 1, glm::value_ptr(center));
+    }
+
+    inline void setA(GLfloat a)
+    {
+        glUniform1f(aUniform, a);
+    }
+
+    inline void setB(GLfloat b)
+    {
+        glUniform1f(bUniform, b);
+    }
+
+    inline void setNumVert(GLint n)
+    {
+        glUniform1i(numVertUniform, n);
+    }
+
+protected:
+    // Model, View, Projection matrix uniform variable in shader program.
+    GLint MVPUniform;
+    GLint centerUniform;
+    GLint aUniform, bUniform;
+    GLint numVertUniform;
+
+    inline virtual void initData()
+    {
+        MVPUniform = glGetUniformLocation(program, "MVP");
+        centerUniform = glGetUniformLocation(program, "vCenter");
+        aUniform = glGetUniformLocation(program, "fA");
+        bUniform = glGetUniformLocation(program, "fB");
+        numVertUniform = glGetUniformLocation(program, "iNumVert");
+    }
+};
+
 #endif

@@ -1,0 +1,17 @@
+#version 300 es
+precision highp float;
+
+#define PI radians(180.0)
+
+// Model, View, Projection matrix.
+uniform mat4 MVP;
+uniform vec3 vCenter;
+uniform float fA;
+uniform float fB;
+uniform int iNumVert;
+
+void main() {
+    float angle = (float(gl_VertexID) * 2.0f * PI) / float(iNumVert);
+    gl_Position = MVP * (vec4(vCenter, 1) + vec4(fA * sin(angle), 0, fB * cos(angle), 1));
+    //gl_PointSize = 5.0;
+}

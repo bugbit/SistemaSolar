@@ -78,6 +78,7 @@ static Camera camera;
 static glm::vec3 obsPos(20, 0, 0), obsCenter(0, 0, 0), obsUp(0, 1, 0);
 static ShaderProgram starGLSL;
 static PlanetShaderProgram planetGLSL;
+static OrbitShaderProgram orbitGLSL;
 static Texture2d stars_tex /*, texture*/;
 static GLuint starsVAO;
 static VAO sphereVAO;
@@ -95,6 +96,7 @@ static void terminate();
 static void terminateGL();
 void main_loop();
 static void displayGL();
+static void displayOrbit(AstroConOrbita &orbit);
 static void displayAstro(Astro &astro);
 
 int main(int, char **)
@@ -199,6 +201,9 @@ static GLboolean initGL()
         return GL_FALSE;
 
     if (!planetGLSL.createProgramFromFile("assets/shaders/planet.vs", "assets/shaders/planet.fs"))
+        return GL_FALSE;
+
+    if (!orbitGLSL.createProgramFromFile("assets/shaders/orbit.vs", "assets/shaders/orbit.fs"))
         return GL_FALSE;
 
     if (!sphereVAO.MakeSolidSphere(1, 32, 32, sphereNumIdxs))
@@ -325,9 +330,21 @@ static void displayGL()
     starGLSL.Use();
     glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
 
+    displayOrbit(tierra);
     displayAstro(sol);
     displayAstro(tierra);
     displayAstro(venus);
+}
+
+static void displayOrbit(AstroConOrbita &orbit)
+{
+    orbitGLSL.Use();
+    orbitGLSL.setMVP(camera.getProjectionMatrix() * camera.getviewMatrix());
+    orbitGLSL.setCenter((glm::vec3 &)orbit.getCenter());
+    orbitGLSL.setA(orbit.getA());
+    orbitGLSL.setB(orbit.getB());
+    orbitGLSL.setNumVert(32);
+    glDrawArrays(GL_LINE_LOOP, 0, 32);
 }
 
 static void displayAstro(Astro &astro)

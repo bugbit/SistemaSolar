@@ -61,6 +61,21 @@ public:
         velAngOrbital = 2 * M_PI / (peridoOrbital * 24 * 60 * 60);
     }
 
+    inline const glm::vec3 &getCenter() const
+    {
+        return center;
+    }
+
+    inline float getA() const
+    {
+        return a;
+    }
+
+    inline float getB() const
+    {
+        return b;
+    }
+
     inline void setAstroCentro(Astro *astro)
     {
         this->astroCentro = astro;
@@ -87,8 +102,7 @@ protected:
     double periodoOrbital; // days
     double velAngOrbital;  // rad/s
 
-    void
-    CalcMVP();
+    void CalcMVP();
 };
 
 class Planeta : public AstroConOrbita
