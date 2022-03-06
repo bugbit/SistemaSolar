@@ -17,8 +17,8 @@ bool AstroConOrbita::initGL()
     if (!Astro::initGL())
         return GL_FALSE;
 
-    a = ejeMayor / 2.0d;
-    b = ejeMayor * sqrt(1 - 2 * excentricidad) / 2.0d;
+    a = ejeMayor / 2.0;
+    b = ejeMayor * sqrt(1 - 2 * excentricidad) / 2.0;
     c = sqrt(a * a - b * b);
     center = glm::vec3(astroCentro->getPosition().x + c, astroCentro->getPosition().y, astroCentro->getPosition().z);
     CalcMVP();

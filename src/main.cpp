@@ -72,7 +72,7 @@ static const GLfloat stars_uv[] =
         0.0,
 };
 
-static double scaleTime = 1000000.0d, lastTime;
+static double scaleTime = 1000000.0, lastTime;
 static GLFWwindow *window;
 static Camera camera;
 static glm::vec3 obsPos(20, 0, 0), obsCenter(0, 0, 0), obsUp(0, 1, 0);
@@ -83,10 +83,10 @@ static Texture2d stars_tex /*, texture*/;
 static GLuint starsVAO;
 static VAO sphereVAO;
 static GLsizei sphereNumIdxs;
-static double radi_terra = (12756.78) / 2.0d;
-static Estrella sol(ASTROS_OPTS_SHADERS::Planet, "sol", "2k_sun.jpg", ((696000) / radi_terra) / 100.0d, glm::vec3(0, 0, 0));
-static Planeta tierra(ASTROS_OPTS_SHADERS::Planet, "tierra", "Tierra2k.jpg", 0.1, 149503 / 10000.0d, 0.016d, 365.2d);
-static Planeta venus(ASTROS_OPTS_SHADERS::Planet, "venus", "2k_venus.jpg", 0.1, 108200 / 10000.0d, 0.001d, 224.701d);
+static double radi_terra = (12756.78) / 2.0;
+static Estrella sol(ASTROS_OPTS_SHADERS::Planet, "sol", "2k_sun.jpg", ((696000) / radi_terra) / 100.0, glm::vec3(0, 0, 0));
+static Planeta tierra(ASTROS_OPTS_SHADERS::Planet, "tierra", "Tierra2k.jpg", 0.1, 149503 / 10000.0, 0.016, 365.2);
+static Planeta venus(ASTROS_OPTS_SHADERS::Planet, "venus", "2k_venus.jpg", 0.1, 108200 / 10000.0, 0.001, 224.701);
 
 static void resizeGL();
 static GLboolean initGL();
@@ -160,7 +160,7 @@ int main(int, char **)
 
     if (initGL())
     {
-        if (init)
+        if (init())
         {
             lastTime = glfwGetTime();
 #ifdef __EMSCRIPTEN__
