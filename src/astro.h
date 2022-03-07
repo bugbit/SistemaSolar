@@ -2,6 +2,7 @@
 
 #define _ASTRO_H
 
+#include "astrosconfig.h"
 #include "texture.h"
 
 class Camera;
