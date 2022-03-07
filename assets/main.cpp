@@ -75,14 +75,12 @@ static const GLfloat stars_uv[] =
 static double scaleTime = 1000000.0, lastTime;
 static GLFWwindow *window;
 static Camera camera;
-static glm::vec3 obsPos(25, 2, 0), obsCenter(0, 0, 0), obsUp(0, 1, 0);
+static glm::vec3 obsPos(20, 0, 0), obsCenter(0, 0, 0), obsUp(0, 1, 0);
 static ShaderProgram starGLSL;
 static PlanetShaderProgram planetGLSL;
 static OrbitShaderProgram orbitGLSL;
 static Texture2d stars_tex /*, texture*/;
 static GLuint starsVAO;
-// static GLuint orbitVAO;
-// GLfloat orbitBuffer[32 * 3];
 static VAO sphereVAO;
 static GLsizei sphereNumIdxs;
 static double radi_terra = (12756.78) / 2.0;
@@ -205,11 +203,11 @@ static GLboolean initGL()
     if (!planetGLSL.createProgramFromFile("assets/shaders/planet.vs", "assets/shaders/planet.fs"))
         return GL_FALSE;
 
+    // if (!orbitGLSL.createProgramFromFile("assets/shaders/orbit.vs", "assets/shaders/orbit.fs"))
+    //     return GL_FALSE;
+
     if (!orbitGLSL.createProgramFromFile("assets/shaders/orbit.vs", "assets/shaders/orbit.fs"))
         return GL_FALSE;
-
-    // if (!orbitGLSL.createProgramFromFile("assets/simple3.vs", "assets/simple3.fs"))
-    //     return GL_FALSE;
 
     if (!sphereVAO.MakeSolidSphere(1, 32, 32, sphereNumIdxs))
         return GL_FALSE;
@@ -218,8 +216,8 @@ static GLboolean initGL()
     glGenVertexArrays(1, &vao);
     glBindVertexArray(vao);
 
-    GLuint vbos[3];
-    glGenBuffers(3, vbos);
+    GLuint vbos[2];
+    glGenBuffers(2, vbos);
 
     glBindBuffer(GL_ARRAY_BUFFER, vbos[0]);
     glBufferData(GL_ARRAY_BUFFER, sizeof(stars_pos), stars_pos, GL_STATIC_DRAW);
@@ -231,11 +229,11 @@ static GLboolean initGL()
     glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 0, BUFFER_OFFSET(0));
     glEnableVertexAttribArray(1);
 
-    starsVAO = vao;
-
     glBindVertexArray(0);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+
+    starsVAO = vao;
 
     sol.add(&tierra);
     sol.add(&venus);
@@ -248,31 +246,6 @@ static GLboolean initGL()
 
     if (!venus.initGL())
         return GL_FALSE;
-
-    // int i = 0;
-    // for (GLfloat *b = orbitBuffer; i < 32; i++)
-    // {
-    //     float angle = (float(i) * 2.0f * M_PI) / float(32);
-    //     glm::vec3 pos(tierra.getCenter() + glm::vec3(tierra.getA() * sin(angle), 0, tierra.getB() * cos(angle)));
-
-    //     *b++ = pos.x;
-    //     *b++ = pos.y;
-    //     *b++ = pos.z;
-    // }
-
-    // glGenVertexArrays(1, &vao);
-    // glBindVertexArray(vao);
-
-    // glBindBuffer(GL_ARRAY_BUFFER, vbos[2]);
-    // glBufferData(GL_ARRAY_BUFFER, sizeof(orbitBuffer), orbitBuffer, GL_STATIC_DRAW);
-    // glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, BUFFER_OFFSET(0));
-    // glEnableVertexAttribArray(0);
-
-    // orbitVAO = vao;
-
-    // glBindVertexArray(0);
-    // glBindBuffer(GL_ARRAY_BUFFER, 0);
-    // glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
     return GL_TRUE;
 }
@@ -361,7 +334,6 @@ static void displayGL()
     glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
 
     displayOrbit(tierra);
-    displayOrbit(venus);
     displayAstro(sol);
     displayAstro(tierra);
     displayAstro(venus);
@@ -369,7 +341,6 @@ static void displayGL()
 
 static void displayOrbit(AstroConOrbita &orbit)
 {
-    // glBindVertexArray(orbitVAO);
     orbitGLSL.Use();
     orbitGLSL.setMVP(camera.getProjectionMatrix() * camera.getviewMatrix());
     orbitGLSL.setCenter((glm::vec3 &)orbit.getCenter());
