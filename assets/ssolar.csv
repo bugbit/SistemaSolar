@@ -1,0 +1,8 @@
+type	name
+# type 0 => ssolar
+# type 1 => star
+# type 2 => planet
+# type 3 => satelic
+0	ssolar
+1	sun
+2	earth
