@@ -35,6 +35,7 @@ https://mathweb.ucsd.edu/~sbuss/CourseWeb/Math155A_2019Winter/Project_2/155A_Wi1
 https://www.big-meter.com/opensource/en/611e436d00a40d704015558d.html
 
 https://www.3dgep.com/texturing-and-lighting-with-opengl-and-glsl/
+https://compphys.go.ro/newtonian-gravity/
 https://medium.com/@keynekassapa13/creating-the-solar-system-opengl-and-c-9d4e4798d759
 https://programmerclick.com/article/60191392793/
 https://www.solarsystemscope.com/textures/
