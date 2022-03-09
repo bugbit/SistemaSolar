@@ -28,15 +28,25 @@ https://medium.com/srojas19/profundizaci%C3%B3n-webgl-2-f21d3a7e63d4
 https://uncovergame.com/2015/01/21/porting-a-complete-c-game-engine-to-html5-through-emscripten/
 https://stackoverflow.com/questions/64170321/how-to-draw-a-smooth-circle-with-a-border-in-glsl
 
+----- solar -----
+
+https://courses.cs.duke.edu/cps124/fall01/projects/solar/
+https://mathweb.ucsd.edu/~sbuss/CourseWeb/Math155A_2019Winter/Project_2/155A_Wi19project2.html
+https://www.big-meter.com/opensource/en/611e436d00a40d704015558d.html
+
 https://www.3dgep.com/texturing-and-lighting-with-opengl-and-glsl/
 https://medium.com/@keynekassapa13/creating-the-solar-system-opengl-and-c-9d4e4798d759
 https://programmerclick.com/article/60191392793/
 https://www.solarsystemscope.com/textures/
 https://balusoft.wordpress.com/2010/12/17/sistema-solar-con-opengl-delphi-7/
 https://graficacion11030440.wordpress.com/sistema-solar/
+
+---------
+
 https://zaguan.unizar.es/record/60522/files/TAZ-PFC-2016-087.pdf
 https://ajmcwind.wordpress.com/2014/01/20/sistema-solar-3d-opengl-c/
 https://www.stratos-ad.com/forums/index.php?topic=16773.0
+
 
 http://neokabuto.blogspot.com/2013/11/open-tk-tutorial-4-addendum-2.html?m=1
 http://software-tecnico-libre.es/es/articulo-por-tema/todas-las-secciones/todos-los-temas/todos-los-articulos/dibujar-con-sistemas-de-funciones-iteradas
