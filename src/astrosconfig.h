@@ -2,6 +2,9 @@
 
 #define _ASTROCONFIG_H
 
+// metros
+#define UA 149597870700
+
 // Sol
 #define RADI_SOL        696000e3        // 696.000 km
 

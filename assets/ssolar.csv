@@ -1,8 +1,6 @@
-type	name
-# type 0 => ssolar
-# type 1 => star
-# type 2 => planet
-# type 3 => satelic
-0	ssolar
-1	sun
-2	earth
+type	name	texture	radius	"semi_major_axis	"	eccentricity
+galaxy	ssolar				
+star	sun	2k_sun.jpg	696000e3		
+planet	earth	Tierra2k.jpg	6378.1e3	149503000e3	0.016
+satellite	moon				
+planet	venus	2k_venus.jpg	6051.8e3	0.723327 AU	0.006772
