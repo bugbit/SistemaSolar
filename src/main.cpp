@@ -3,6 +3,7 @@
 #include "vao.h"
 #include "camera.h"
 #include "astro.h"
+#include "csv.h"
 
 // Un arreglo de 3 vectores que representan 3 vértices
 // static const NodePoints g_vertex_buffer_data = {
@@ -287,6 +288,9 @@ static GLboolean init()
 
 static GLboolean initAstros()
 {
+    Csv csv;
+
+    csv.load("assets/ssolar.csv");
     // sol=new Estrella();
     return GL_TRUE;
 }

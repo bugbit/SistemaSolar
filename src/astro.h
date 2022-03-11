@@ -2,8 +2,10 @@
 
 #define _ASTRO_H
 
-#include "astrosconfig.h"
 #include "texture.h"
+
+// metros
+#define UA 149597870700
 
 class Camera;
 
@@ -12,9 +14,33 @@ enum ASTROS_OPTS_SHADERS
     Planet = 0
 };
 
-class Astro
+enum COSMOTIPOELEMENTO
+{
+    GALAXIA,
+    ESTRELLA,
+    PLANETA,
+    SATELITE
+};
+
+class CosmoElemento
 {
 public:
+    inline CosmoElemento() {}
+    inline CosmoElemento(COSMOTIPOELEMENTO tipo) : tipo(tipo) {}
+
+    inline COSMOTIPOELEMENTO getTipo() const
+    {
+        return tipo;
+    }
+
+protected:
+    COSMOTIPOELEMENTO tipo;
+};
+
+class Astro : public CosmoElemento
+{
+public:
+    inline Astro(COSMOTIPOELEMENTO tipo) : CosmoElemento(tipo) {}
     inline Astro(ASTROS_OPTS_SHADERS shader, const char *name, const char *filetex, glm::float32 radius, glm::vec3 position)
         : shader(shader), name(name), filetex(filetex), radius(radius), position(position)
     {
@@ -56,6 +82,7 @@ class Estrella;
 class AstroConOrbita : public Astro
 {
 public:
+    inline AstroConOrbita(COSMOTIPOELEMENTO tipo) : Astro(tipo) {}
     AstroConOrbita(ASTROS_OPTS_SHADERS shader, const char *name, const char *filetex, glm::float32 radius, double ejeMayor, double excentricidad, double peridoOrbital)
         : Astro(shader, name, filetex, radius), astroCentro(NULL), ejeMayor(ejeMayor), excentricidad(excentricidad), periodoOrbital(peridoOrbital), center(), angOrbital(0)
     {
@@ -109,6 +136,7 @@ protected:
 class Planeta : public AstroConOrbita
 {
 public:
+    inline Planeta() : AstroConOrbita(PLANETA) {}
     Planeta(ASTROS_OPTS_SHADERS shader, const char *name, const char *filetex, glm::float32 radius, double ejeMayor, double excentricidad, double peridoOrbital)
         : AstroConOrbita(shader, name, filetex, radius, ejeMayor, excentricidad, peridoOrbital)
     {
@@ -120,6 +148,7 @@ protected:
 class Estrella : public Astro
 {
 public:
+    inline Estrella() : Astro(ESTRELLA) {}
     Estrella(ASTROS_OPTS_SHADERS shader, const char *name, const char *filetex, glm::float32 radius, glm::vec3 position)
         : Astro(shader, name, filetex, radius, position), planetas()
     {
@@ -133,8 +162,22 @@ public:
 
     virtual bool initGL();
 
-protected:
+private:
     std::vector<Planeta *> planetas;
+};
+
+class Galaxia : public CosmoElemento
+{
+public:
+    inline Galaxia() : CosmoElemento(ESTRELLA) {}
+
+    inline void add(Estrella *estrella)
+    {
+        estrellas.push_back(estrella);
+    }
+
+private:
+    std::vector<Estrella *> estrellas;
 };
 
 #endif

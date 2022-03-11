@@ -2,6 +2,8 @@
 #include <iostream>
 #include <fstream>
 #include <vector>
+#include <sstream>
+#include <map>
 #define _USE_MATH_DEFINES
 #include <math.h>
 #include <assert.h>
