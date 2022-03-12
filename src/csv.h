@@ -21,11 +21,16 @@ public:
     Csv();
     bool load(const char *file);
     bool load(std::ifstream &stream);
+    inline Galaxia *getGalaxia() const
+    {
+        return galaxia;
+    }
 
 private:
     std::map<std::string, EFieldHeader> valuesfieldsHeaders;
     std::map<std::string, COSMOTIPOELEMENTO> tipos;
     std::vector<EFieldHeader> fieldsheaders;
+    Galaxia *galaxia;
 
     bool readHeaders(std::ifstream &stream);
     inline COSMOTIPOELEMENTO getTipo(std::string &value)

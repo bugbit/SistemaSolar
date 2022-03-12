@@ -33,8 +33,19 @@ public:
         return tipo;
     }
 
+    inline void setName(std::string _name)
+    {
+        name = _name;
+    }
+
+    inline const std::string &getName() const
+    {
+        return name;
+    }
+
 protected:
     COSMOTIPOELEMENTO tipo;
+    std::string name;
 };
 
 class Astro : public CosmoElemento
@@ -42,11 +53,11 @@ class Astro : public CosmoElemento
 public:
     inline Astro(COSMOTIPOELEMENTO tipo) : CosmoElemento(tipo) {}
     inline Astro(ASTROS_OPTS_SHADERS shader, const char *name, const char *filetex, glm::float32 radius, glm::vec3 position)
-        : shader(shader), name(name), filetex(filetex), radius(radius), position(position)
+        : shader(shader), name2(name), filetex(filetex), radius(radius), position(position)
     {
     }
     inline Astro(ASTROS_OPTS_SHADERS shader, const char *name, const char *filetex, glm::float32 radius)
-        : shader(shader), name(name), filetex(filetex), radius(radius), position()
+        : shader(shader), name2(name), filetex(filetex), radius(radius), position()
     {
     }
 
@@ -69,7 +80,7 @@ public:
 
 protected:
     ASTROS_OPTS_SHADERS shader;
-    const char *name;
+    const char *name2;
     const char *filetex;
     glm::float32 radius;
     glm::vec3 position;

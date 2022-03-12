@@ -1,3 +1,4 @@
+#include "error.h"
 #include "shaders.h"
 #include "texture.h"
 #include "vao.h"
@@ -177,10 +178,16 @@ int main(int, char **)
 #endif
         }
         else
+        {
+            aerr.print();
             terminate();
+        }
     }
     else
+    {
+        aerr.print();
         terminateGL();
+    }
 
     return EXIT_SUCCESS;
 }
@@ -290,7 +297,8 @@ static GLboolean initAstros()
 {
     Csv csv;
 
-    csv.load("assets/ssolar.csv");
+    if (!csv.load("assets/ssolar.csv"))
+        return GL_FALSE;
     // sol=new Estrella();
     return GL_TRUE;
 }

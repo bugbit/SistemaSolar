@@ -1,6 +1,7 @@
 #include "csv.h"
+#include "error.h"
 
-Csv::Csv()
+Csv::Csv() : galaxia(NULL)
 {
     valuesfieldsHeaders["type"] = TYPE;
     valuesfieldsHeaders["name"] = NAME,
@@ -21,7 +22,7 @@ bool Csv::load(const char *file)
     std::cout << "read file - '" << file << "'" << std::endl;
     if (!stream.is_open())
     {
-        std::cerr << "Could not open the file - '" << file << "'" << std::endl;
+        aerr << "Could not open the file - '" << file << "'" << std::endl;
 
         return false;
     }
@@ -37,10 +38,10 @@ bool Csv::load(std::ifstream &stream)
     if (!readHeaders(stream))
         return false;
 
-    Galaxia *galaxia = NULL;
     Estrella *estrella = NULL;
     Planeta *planeta = NULL;
 
+    galaxia = NULL;
     for (int linea = 2; std::getline(stream, line); linea++)
     {
         std::istringstream svalue(line);
@@ -61,7 +62,9 @@ bool Csv::load(std::ifstream &stream)
                     elem = estrella = new Estrella();
                     if (galaxia == NULL)
                     {
-                        // cout << "In line : " << linea << "You have defined the star without first creating the galaxy"
+                        aerr << "In line : " << linea << "You have defined the star without first creating the galaxy" << std::endl;
+
+                        return false;
                     }
                     break;
 
@@ -86,7 +89,7 @@ bool Csv::readHeaders(std::ifstream &stream)
 
     if (!std::getline(stream, line))
     {
-        std::cerr << "Without headers - '" << std::endl;
+        aerr << "Without headers - '" << std::endl;
 
         return false;
     }
