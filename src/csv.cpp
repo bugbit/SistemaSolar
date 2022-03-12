@@ -59,13 +59,22 @@ bool Csv::load(std::ifstream &stream)
                     elem = galaxia = new Galaxia();
                     break;
                 case ESTRELLA:
-                    elem = estrella = new Estrella();
                     if (galaxia == NULL)
                     {
                         aerr << "In line : " << linea << "You have defined the star without first creating the galaxy" << std::endl;
 
                         return false;
                     }
+                    elem = estrella = new Estrella();
+                case PLANETA:
+                    if (estrella == NULL)
+                    {
+                        aerr << "In line : " << linea << "You have defined the planet without first creating the star" << std::endl;
+
+                        return false;
+                    }
+                    elem = planeta = new Planeta();
+                    estrella->add(planeta);
                     break;
 
                 default:
@@ -73,7 +82,15 @@ bool Csv::load(std::ifstream &stream)
                     break;
                 }
                 break;
+            case NAME:
+                if (elem == NULL)
+                {
+                    aerr << "In line : " << linea << "The first column must be 'type'" << std::endl;
 
+                    return false;
+                }
+                elem->setName(value);
+                break;
             default:
                 break;
             }

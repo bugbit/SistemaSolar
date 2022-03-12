@@ -81,7 +81,7 @@ public:
 protected:
     ASTROS_OPTS_SHADERS shader;
     const char *name2;
-    const char *filetex;
+    std::string filetex;
     glm::float32 radius;
     glm::vec3 position;
     glm::mat4 modelMatrix;

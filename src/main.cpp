@@ -74,10 +74,13 @@ static const GLfloat stars_uv[] =
         0.0,
 };
 
+static int wwidth = 800, wheight = 600;
+static int wwwidth, wwheight, wwrefreshrate;
 static double scaleTime = 1000000.0, lastTime;
 static GLFWwindow *window;
 static Camera camera;
-static glm::vec3 obsPos(25, 2, 0), obsCenter(0, 0, 0), obsUp(0, 1, 0);
+// static glm::vec3 obsPos(10, 5, 10), obsCenter(0, 0, 0), obsUp(0, 1, 0);
+static glm::vec3 obsPos(50, 5, 50), obsCenter(-50, -5, -50), obsUp(0, 1, 0);
 static ShaderProgram starGLSL;
 static PlanetShaderProgram planetGLSL;
 static OrbitShaderProgram orbitGLSL;
@@ -87,12 +90,18 @@ static GLuint starsVAO;
 // GLfloat orbitBuffer[32 * 3];
 static VAO sphereVAO;
 static GLsizei sphereNumIdxs;
+static double escala1 = 30.0 / (11.2 * 12756.78e3 / 2.0);
+static double escala2 = 350.0 / (590010000e3);
+static double escala3 = 90.0 / (14950300e3);
 static double radi_terra = (12756.78) / 2.0;
-static Estrella sol(ASTROS_OPTS_SHADERS::Planet, "sol", "2k_sun.jpg", ((696000) / radi_terra) / 100.0, glm::vec3(0, 0, 0));
-static Planeta tierra(ASTROS_OPTS_SHADERS::Planet, "tierra", "Tierra2k.jpg", 0.1, 149503 / 10000.0, 0.016, 365.2);
-static Planeta venus(ASTROS_OPTS_SHADERS::Planet, "venus", "2k_venus.jpg", 0.1, 108200 / 10000.0, 0.001, 224.701);
+static Estrella sol(ASTROS_OPTS_SHADERS::Planet, "sol", "2k_sun.jpg", 696000e3 * escala3, glm::vec3(0, 0, 0));
+static Planeta tierra(ASTROS_OPTS_SHADERS::Planet, "tierra", "Tierra2k.jpg", 6378.1e3 * escala1, 149503000e3 * escala2, 0.016, 365.2);
+static Planeta venus(ASTROS_OPTS_SHADERS::Planet, "venus", "2k_venus.jpg", 6051.8e3 * escala1, 108200000e3 * escala2, 0.001, 224.701);
 
+static void window_size_callback(GLFWwindow *window, int width, int height);
+static void key_callback(GLFWwindow *window, int key, int scancode, int action, int mods);
 static void resizeGL();
+static void resizeGL(int width, int height);
 static GLboolean initGL();
 static GLboolean init();
 static GLboolean initAstros();
@@ -129,7 +138,7 @@ int main(int, char **)
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 
     /* Create a windowed mode window and its OpenGL context */
-    window = glfwCreateWindow(640, 480, "Hello World", NULL, NULL);
+    window = glfwCreateWindow(wwidth, wheight, "System solar", NULL, NULL);
     if (!window)
     {
 #ifndef __EMSCRIPTEN__
@@ -161,6 +170,8 @@ int main(int, char **)
 #endif
 
     resizeGL();
+    glfwSetKeyCallback(window, key_callback);
+    glfwSetWindowSizeCallback(window, window_size_callback);
 
     if (initGL())
     {
@@ -192,12 +203,24 @@ int main(int, char **)
     return EXIT_SUCCESS;
 }
 
+static void window_size_callback(GLFWwindow *window, int width, int height)
+{
+    wwidth = width;
+    wheight = height;
+    resizeGL(width, height);
+}
+
 static void resizeGL()
 {
     int width, height;
 
     glfwGetWindowSize(window, &width, &height);
 
+    resizeGL(width, height);
+}
+
+static void resizeGL(int width, int height)
+{
     camera.viewport(0, 0, width, height);
     camera.setProjectionRH(30.0f, width / (float)height, 0.1f, 200.0f);
 }
@@ -317,6 +340,30 @@ static void terminate()
     //     sol = NULL;
     // }
     glfwTerminate();
+}
+
+static void key_callback(GLFWwindow *window, int key, int scancode, int action, int mods)
+{
+    if (key == GLFW_KEY_X && action == GLFW_PRESS)
+        glfwSetWindowShouldClose(window, GLFW_TRUE);
+#ifndef __EMSCRIPTEN__
+    if (key == GLFW_KEY_F && action == GLFW_PRESS)
+    {
+        GLFWmonitor *monitor = glfwGetPrimaryMonitor();
+        const GLFWvidmode *mode = glfwGetVideoMode(monitor);
+        bool isfullscreen = glfwGetWindowMonitor(window) != nullptr;
+
+        if (isfullscreen)
+            glfwSetWindowMonitor(window, nullptr, 0, 0, wwwidth, wwheight, wwrefreshrate);
+
+        else
+        {
+            wwwidth = wwidth;
+            wwheight = wheight;
+            glfwSetWindowMonitor(window, monitor, 0, 0, mode->width, mode->height, mode->refreshRate);
+        }
+    }
+#endif
 }
 
 void main_loop()

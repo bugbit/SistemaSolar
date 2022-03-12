@@ -1,6 +1,4 @@
-type	name	texture	radius	a	e
 galaxy	ssolar				
 star	sun	2k_sun.jpg	696000e3		
 planet	earth	Tierra2k.jpg	6378.1e3	149503000e3	0.016
-satellite	moon				
 planet	venus	2k_venus.jpg	6051.8e3	0.723327 AU	0.006772

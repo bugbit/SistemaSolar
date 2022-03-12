@@ -2,7 +2,7 @@
 
 bool Astro::initGL()
 {
-    if (filetex == NULL)
+    if (filetex.empty())
         return GL_TRUE;
 
     std::string file = "assets/textures/";
