@@ -4,7 +4,6 @@
 #include "vao.h"
 #include "camera.h"
 #include "astro.h"
-#include "csv.h"
 
 // Un arreglo de 3 vectores que representan 3 vértices
 // static const NodePoints g_vertex_buffer_data = {
@@ -318,10 +317,18 @@ static GLboolean init()
 
 static GLboolean initAstros()
 {
-    Csv csv;
+    io::CSVReader<31> in("assets/sol_data.csv");
 
-    if (!csv.load("assets/ssolar.csv"))
-        return GL_FALSE;
+    in.read_header(io::ignore_missing_column, "eName", "isPlanet", "semimajorAxis", "perihelion", "aphelion", "eccentricity", "inclination", "density", "gravity", "escape", "meanRadius", "equaRadius", "polarRadius", "flattening", "dimension", "sideralOrbit", "sideralRotation", "discoveryDate", "mass_kg", "volume", "orbit_type", "orbits", "bondAlbido", "geomAlbido", "RV_abs", "p_transit", "transit_visibility", "transit_depth", "massj", "semimajorAxis_AU", "grav_int");
+
+    for (;;)
+    {
+        SolDataItem *data = new SolDataItem();
+
+        if (!in.read_row(data->eName, data->isPlanet, data->semimajorAxis, data->perihelion, data->aphelion, data->eccentricity, data->inclination, data->density, data->gravity, data->escape, data->meanRadius, data->equaRadius, data->polarRadius, data->flattening, data->dimension, data->sideralOrbit, data->sideralRotation, data->discoveryDate, data->mass_kg, data->volume, data->orbit_type, data->orbits, data->bondAlbido, data->geomAlbido, data->RV_abs, data->p_transit, data->transit_visibility, data->transit_depth, data->massj, data->semimajorAxis_AU, data->grav_int))
+            break;
+    }
+
     // sol=new Estrella();
     return GL_TRUE;
 }

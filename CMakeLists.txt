@@ -8,10 +8,10 @@ endif()
 
 include_directories(extern)
 
-include(CTest)
-enable_testing()
+#include(CTest)
+#enable_testing()
 
-add_executable(ssolar src/main.cpp src/error.cpp src/shaders.cpp src/texture.cpp src/vao.cpp src/astro.cpp src/csv.cpp)
+add_executable(ssolar src/main.cpp src/error.cpp src/shaders.cpp src/texture.cpp src/vao.cpp src/astro.cpp)
 
 target_precompile_headers(ssolar PUBLIC src/pch.h)
 

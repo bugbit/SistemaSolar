@@ -22,6 +22,72 @@ enum COSMOTIPOELEMENTO
     SATELITE
 };
 
+typedef struct
+{
+//eName - string - the name of the object
+std::string eName;
+//isPlanet - boolean - is the object a planet (this includes the five dwarf planets)
+std::string isPlanet;
+//semimajorAxis - integer - mean orbital distance in km
+long long int semimajorAxis;
+//perihelion - integer - closest distance from the Sun during its orbit
+long long int perihelion;
+//aphelion - integer - furthest distance from the Sun during its orbit
+long long int aphelion;
+//eccentricity - double - ratio of perihelion to aphelion
+double eccentricity;
+//inclination - double - difference in angle between body's orbit and the ecliptic
+double inclination;
+//density - double - average density of the body
+double density;
+//gravity - double - surface gravity, measures in m/s^2
+double gravity;
+//escape - integer - escape velocity at surface level
+long long escape;
+//meanRadius - double - average total radius
+double meanRadius;
+//equaRadius - double - average equatorial radius
+double equaRadius;
+//polarRadius - double - average polar radius
+double polarRadius;
+//flattening - double - ratio of equatorial radius to polar radius
+double flattening;
+//dimension - string - approximate spatial dimensions of irregular shaped objects
+std::string dimension;
+//sideralOrbit - double - orbital period in Earth days
+double sideralOrbit;
+//sideralRotation - double - rotational period in hours
+double sideralRotation;
+//discoveryDate - date - date of discovery, this is left blank for any objects that were known since antiquity
+std::string discoveryDate;
+//mass_kg - integer - total estimated mass of object in kg
+double mass_kg;
+//volume - integer - approximate volume in km^3
+long long volume;
+//orbit_type - class - either primary; orbites the Sun, or secondary; orbits a planet
+std::string orbit_type;
+//orbits - class - the planet that the body orbits. If it does not orbit a planet then it is NA
+std::string orbits;
+//bondAlbido - double - Bond albedo, portion of light/energy that get reflected by the surface
+double bondAlbido;
+//geomAlbido - double - Geometric albedo, modified reflective metric for spherical objects which, because of opposition effects, can be greater than 1
+double geomAlbido;
+//RV_abs - double - radial velocity of Sun due to object's gravitational pull
+double RV_abs;
+//p_transit - double - probability that a transit will be observable
+double p_transit;
+//transit_visibility - double - angle from the ecliptic that a transit will be visible
+double transit_visibility;
+//transit_depth - double - portion of Sun's energy that is blocked during transit
+double transit_depth;
+//massj - integer - mass compared to Jupiter
+long long massj;
+//semimajorAxis_AU - integer - orbital radius in Astronomical Units
+long long semimajorAxis_AU;
+//grav_int - gravitational interaction with the Sun
+double grav_int;
+} SolDataItem;
+
 class CosmoElemento
 {
 public:
@@ -189,6 +255,12 @@ public:
 
 private:
     std::vector<Estrella *> estrellas;
+};
+
+class SSolar : public Galaxia
+{
+public:
+    inline SSolar() : Galaxia() {}
 };
 
 #endif
