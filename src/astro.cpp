@@ -1,7 +1,9 @@
 #include "astro.h"
 
-bool Astro::initGL()
+GLboolean Astro::initGL()
 {
+    if (!CosmoElemento::initGL())
+        return GL_FALSE;
     if (filetex.empty())
         return GL_TRUE;
 
@@ -12,7 +14,7 @@ bool Astro::initGL()
     return texture.load(file.c_str());
 }
 
-bool AstroConOrbita::initGL()
+GLboolean AstroConOrbita::initGL()
 {
     if (!Astro::initGL())
         return GL_FALSE;
@@ -31,12 +33,26 @@ void AstroConOrbita::CalcMVP()
     modelMatrix = glm::translate(center) * glm::translate(glm::vec3(a * sin(angOrbital), 0, b * cos(angOrbital))) * glm::scale(glm::vec3(radius));
 }
 
-bool Estrella::initGL()
+GLboolean Estrella::initGL()
 {
     if (!Astro::initGL())
         return GL_FALSE;
 
     modelMatrix = glm::translate(position) * glm::scale(glm::vec3(radius));
+
+    std::for_each(planetas.begin(), planetas.end(), [](Planeta *p)
+                  { p->initGL(); });
+
+    return GL_TRUE;
+}
+
+GLboolean Galaxia::initGL()
+{
+    if (!CosmoElemento::initGL())
+        return GL_FALSE;
+
+    std::for_each(estrellas.begin(), estrellas.end(), [](Estrella *e)
+                  { e->initGL(); });
 
     return GL_TRUE;
 }
