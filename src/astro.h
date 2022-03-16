@@ -69,11 +69,11 @@ std::string orbit_type;
 //orbits - class - the planet that the body orbits. If it does not orbit a planet then it is NA
 std::string orbits;
 //bondAlbido - double - Bond albedo, portion of light/energy that get reflected by the surface
-double bondAlbido;
+std::string bondAlbido;
 //geomAlbido - double - Geometric albedo, modified reflective metric for spherical objects which, because of opposition effects, can be greater than 1
-double geomAlbido;
+std::string geomAlbido;
 //RV_abs - double - radial velocity of Sun due to object's gravitational pull
-double RV_abs;
+std::string RV_abs;
 //p_transit - double - probability that a transit will be observable
 double p_transit;
 //transit_visibility - double - angle from the ecliptic that a transit will be visible
@@ -81,9 +81,9 @@ double transit_visibility;
 //transit_depth - double - portion of Sun's energy that is blocked during transit
 double transit_depth;
 //massj - integer - mass compared to Jupiter
-long long massj;
+double massj;
 //semimajorAxis_AU - integer - orbital radius in Astronomical Units
-long long semimajorAxis_AU;
+double semimajorAxis_AU;
 //grav_int - gravitational interaction with the Sun
 double grav_int;
 } SolDataItem;

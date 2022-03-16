@@ -329,6 +329,8 @@ static GLboolean initAstros()
             break;
     }
 
+    std::cout << "Loaded sol_data.csv" << std::endl;
+
     // sol=new Estrella();
     return GL_TRUE;
 }
