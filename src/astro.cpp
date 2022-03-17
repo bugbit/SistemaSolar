@@ -1,9 +1,16 @@
 #include "astro.h"
 
+void Astro::calcDatas(const CosmoEscala *escalas)
+{
+    // if (data!=NULL)
+    //     radius=data->
+}
+
 GLboolean Astro::initGL()
 {
     if (!CosmoElemento::initGL())
         return GL_FALSE;
+
     if (filetex.empty())
         return GL_TRUE;
 

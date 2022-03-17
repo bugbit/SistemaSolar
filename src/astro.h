@@ -11,7 +11,8 @@ class Camera;
 
 enum ASTROS_OPTS_SHADERS
 {
-    Planet = 0
+    None,
+    Planet
 };
 
 enum COSMOTIPOELEMENTO
@@ -88,6 +89,33 @@ typedef struct
     std::string grav_int;
 } SolDataItem;
 
+typedef struct
+{
+    // eName - string - the name of the object
+    std::string eName;
+    // texture - string
+    std::string texture;
+    // tshader - integer (0 = none, 1 = planet)
+    int tshader;
+} SSolarDataItem;
+
+typedef struct
+{
+    double numerator, denominator;
+
+    inline double calc(double valor) const
+    {
+        return valor * numerator / denominator;
+    }
+} CosmoEscalaItem;
+
+typedef struct
+{
+    CosmoEscalaItem radio_planeta;
+    CosmoEscalaItem distancia;
+    CosmoEscalaItem radio_estrella;
+} CosmoEscala;
+
 class CosmoElemento
 {
 public:
@@ -114,6 +142,8 @@ public:
         data = _data;
     }
 
+    inline virtual void calcDatas(const CosmoEscala *escalas = NULL) {}
+
     inline virtual GLboolean initGL() { return GL_TRUE; }
 
 protected:
@@ -124,7 +154,10 @@ protected:
 class Astro : public CosmoElemento
 {
 public:
-    inline Astro(COSMOTIPOELEMENTO tipo, const SolDataItem *data = NULL) : CosmoElemento(tipo, data) {}
+    inline Astro(COSMOTIPOELEMENTO tipo, const SolDataItem *data = NULL)
+        : CosmoElemento(tipo, data), shader(None), filetex(), radius(0), position()
+    {
+    }
     inline Astro(ASTROS_OPTS_SHADERS shader, const char *name, const char *filetex, glm::float32 radius, glm::vec3 position)
         : shader(shader), name2(name), filetex(filetex), radius(radius), position(position)
     {
@@ -134,7 +167,18 @@ public:
     {
     }
 
+    virtual void calcDatas(const CosmoEscala *escalas = NULL);
     virtual GLboolean initGL();
+
+    inline void setFileTex(std::string _filetex)
+    {
+        filetex = _filetex;
+    }
+
+    inline void setShader(ASTROS_OPTS_SHADERS _shader)
+    {
+        shader = _shader;
+    }
 
     inline const glm::vec3 &getPosition() const
     {
@@ -166,7 +210,8 @@ class Estrella;
 class AstroConOrbita : public Astro
 {
 public:
-    inline AstroConOrbita(COSMOTIPOELEMENTO tipo, const SolDataItem *data = NULL) : Astro(tipo, data) {}
+    inline AstroConOrbita(COSMOTIPOELEMENTO tipo, const SolDataItem *data = NULL)
+        : Astro(tipo, data), astroCentro(NULL), ejeMayor(0), excentricidad(0), periodoOrbital(0), center(), angOrbital(0) {}
     AstroConOrbita(ASTROS_OPTS_SHADERS shader, const char *name, const char *filetex, glm::float32 radius, double ejeMayor, double excentricidad, double peridoOrbital)
         : Astro(shader, name, filetex, radius), astroCentro(NULL), ejeMayor(ejeMayor), excentricidad(excentricidad), periodoOrbital(peridoOrbital), center(), angOrbital(0)
     {
@@ -280,11 +325,20 @@ public:
     inline void add(Planeta *planeta)
     {
         mapPlanetaNames[planeta->getData().eName] = planeta;
+        sol->add(planeta);
     }
 
     inline Planeta *getPlaneta(const std::string &name)
     {
         return mapPlanetaNames[name];
+    }
+
+    inline Astro *getAstro(const std::string &name)
+    {
+        if (sol->getData().eName == name)
+            return sol;
+
+        return getPlaneta(name);
     }
 
 private:

@@ -332,9 +332,9 @@ static GLboolean initAstros()
 
 static GLboolean loadAstros()
 {
-    io::CSVReader<31> in("assets/sol_data.csv");
+    io::CSVReader<31> sol_in("assets/sol_data.csv");
 
-    in.read_header(io::ignore_missing_column, "eName", "isPlanet", "semimajorAxis", "perihelion", "aphelion", "eccentricity", "inclination", "density", "gravity", "escape", "meanRadius", "equaRadius", "polarRadius", "flattening", "dimension", "sideralOrbit", "sideralRotation", "discoveryDate", "mass_kg", "volume", "orbit_type", "orbits", "bondAlbido", "geomAlbido", "RV_abs", "p_transit", "transit_visibility", "transit_depth", "massj", "semimajorAxis_AU", "grav_int");
+    sol_in.read_header(io::ignore_missing_column, "eName", "isPlanet", "semimajorAxis", "perihelion", "aphelion", "eccentricity", "inclination", "density", "gravity", "escape", "meanRadius", "equaRadius", "polarRadius", "flattening", "dimension", "sideralOrbit", "sideralRotation", "discoveryDate", "mass_kg", "volume", "orbit_type", "orbits", "bondAlbido", "geomAlbido", "RV_abs", "p_transit", "transit_visibility", "transit_depth", "massj", "semimajorAxis_AU", "grav_int");
 
     Estrella *sol = new Estrella();
 
@@ -343,14 +343,14 @@ static GLboolean loadAstros()
     {
         SolDataItem *data = new SolDataItem();
 
-        if (!in.read_row(data->eName, data->isPlanet, data->semimajorAxis, data->perihelion, data->aphelion, data->eccentricity, data->inclination, data->density, data->gravity, data->escape, data->meanRadius, data->equaRadius, data->polarRadius, data->flattening, data->dimension, data->sideralOrbit, data->sideralRotation, data->discoveryDate, data->mass_kg, data->volume, data->orbit_type, data->orbits, data->bondAlbido, data->geomAlbido, data->RV_abs, data->p_transit, data->transit_visibility, data->transit_depth, data->massj, data->semimajorAxis_AU, data->grav_int))
+        if (!sol_in.read_row(data->eName, data->isPlanet, data->semimajorAxis, data->perihelion, data->aphelion, data->eccentricity, data->inclination, data->density, data->gravity, data->escape, data->meanRadius, data->equaRadius, data->polarRadius, data->flattening, data->dimension, data->sideralOrbit, data->sideralRotation, data->discoveryDate, data->mass_kg, data->volume, data->orbit_type, data->orbits, data->bondAlbido, data->geomAlbido, data->RV_abs, data->p_transit, data->transit_visibility, data->transit_depth, data->massj, data->semimajorAxis_AU, data->grav_int))
             break;
         if (data->isPlanet == "TRUE")
             ssolar->add(new Planeta(data));
         else if (data->orbit_type == "Secondary")
         {
             // es un satélite
-            std::cout << data->eName << " " << data->orbits << " " << std::endl;
+            // std::cout << data->eName << " " << data->orbits << " " << std::endl;
         }
         else if (data->eName == "Sun")
         {
@@ -359,13 +359,32 @@ static GLboolean loadAstros()
         else
         {
             // es un asteroide
-            std::cout << data->eName << std::endl;
+            // std::cout << data->eName << std::endl;
         }
     }
 
     // Planeta *p = ssolar->getPlaneta("Earth2");
 
-    std::cout << "Loaded sol_data.csv" << std::endl;
+    // SSolarData
+
+    io::CSVReader<3> ssolar_in("assets/ssolar.csv");
+
+    ssolar_in.read_header(io::ignore_missing_column, "eName", "texture", "tshader");
+
+    SSolarDataItem ssolardata;
+
+    while (ssolar_in.read_row(ssolardata.eName, ssolardata.texture, ssolardata.tshader))
+    {
+        Astro *astro = ssolar->getAstro(ssolardata.eName);
+
+        if (astro != NULL)
+        {
+            astro->setFileTex(ssolardata.texture);
+            astro->setShader((ASTROS_OPTS_SHADERS)ssolardata.tshader);
+        }
+    }
+
+    std::cout << "Loaded astros data" << std::endl;
 
     return GL_TRUE;
 }
