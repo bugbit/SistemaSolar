@@ -11,16 +11,19 @@ class Camera;
 
 enum ASTROS_OPTS_SHADERS
 {
-    None,
-    Planet
+    AOS_NONE,
+    PLANET
 };
 
 enum COSMOTIPOELEMENTO
 {
-    GALAXIA,
-    ESTRELLA,
-    PLANETA,
-    SATELITE
+    ASTRO = 0x8,
+    ASTROCONORBITA = ASTRO | 0x100,
+    NONE = 0,
+    GALAXIA = 1,
+    ESTRELLA = 2 | ASTRO,
+    PLANETA = 3 | ASTROCONORBITA,
+    SATELITE = 4 | ASTROCONORBITA
 };
 
 typedef struct
@@ -146,6 +149,8 @@ public:
 
     inline virtual GLboolean initGL() { return GL_TRUE; }
 
+    inline virtual void Orbita(double ellapse) {}
+
 protected:
     COSMOTIPOELEMENTO tipo;
     const SolDataItem *data;
@@ -155,16 +160,21 @@ class Astro : public CosmoElemento
 {
 public:
     inline Astro(COSMOTIPOELEMENTO tipo, const SolDataItem *data = NULL)
-        : CosmoElemento(tipo, data), shader(None), filetex(), radius(0), position()
+        : CosmoElemento(tipo, data), shader(ASTROS_OPTS_SHADERS::AOS_NONE), filetex(), radius(0), position()
     {
     }
-    inline Astro(ASTROS_OPTS_SHADERS shader, const char *name, const char *filetex, glm::float32 radius, glm::vec3 position)
-        : shader(shader), name2(name), filetex(filetex), radius(radius), position(position)
+    inline Astro(COSMOTIPOELEMENTO tipo, ASTROS_OPTS_SHADERS shader, const char *name, const char *filetex, glm::float32 radius, glm::vec3 position)
+        : CosmoElemento(tipo), shader(shader), name2(name), filetex(filetex), radius(radius), position(position)
     {
     }
-    inline Astro(ASTROS_OPTS_SHADERS shader, const char *name, const char *filetex, glm::float32 radius)
-        : shader(shader), name2(name), filetex(filetex), radius(radius), position()
+    inline Astro(COSMOTIPOELEMENTO tipo, ASTROS_OPTS_SHADERS shader, const char *name, const char *filetex, glm::float32 radius)
+        : CosmoElemento(tipo), shader(shader), name2(name), filetex(filetex), radius(radius), position()
     {
+    }
+
+    inline ASTROS_OPTS_SHADERS getShader() const
+    {
+        return shader;
     }
 
     virtual void calcDatas(const CosmoEscala *escalas = NULL);
@@ -203,6 +213,15 @@ protected:
     glm::vec3 position;
     glm::mat4 modelMatrix;
     Texture2d texture;
+
+    virtual double getDataRadius(const SolDataItem &data) const
+    {
+        return data.equaRadius;
+    }
+    inline virtual const CosmoEscalaItem &getEscalaItemRadius(const CosmoEscala &escalas) const
+    {
+        return escalas.radio_planeta;
+    }
 };
 
 class Estrella;
@@ -212,10 +231,9 @@ class AstroConOrbita : public Astro
 public:
     inline AstroConOrbita(COSMOTIPOELEMENTO tipo, const SolDataItem *data = NULL)
         : Astro(tipo, data), astroCentro(NULL), ejeMayor(0), excentricidad(0), periodoOrbital(0), center(), angOrbital(0) {}
-    AstroConOrbita(ASTROS_OPTS_SHADERS shader, const char *name, const char *filetex, glm::float32 radius, double ejeMayor, double excentricidad, double peridoOrbital)
-        : Astro(shader, name, filetex, radius), astroCentro(NULL), ejeMayor(ejeMayor), excentricidad(excentricidad), periodoOrbital(peridoOrbital), center(), angOrbital(0)
+    AstroConOrbita(COSMOTIPOELEMENTO tipo, ASTROS_OPTS_SHADERS shader, const char *name, const char *filetex, glm::float32 radius, double ejeMayor, double excentricidad, double periodoOrbital)
+        : Astro(tipo, shader, name, filetex, radius), astroCentro(NULL), ejeMayor(ejeMayor), excentricidad(excentricidad), periodoOrbital(periodoOrbital), center(), angOrbital(0)
     {
-        velAngOrbital = 2 * M_PI / (peridoOrbital * 24 * 60 * 60);
     }
 
     inline const glm::vec3 &getCenter() const
@@ -238,10 +256,11 @@ public:
         this->astroCentro = astro;
     }
 
-    virtual GLboolean initGL();
+    // virtual GLboolean initGL();
+    virtual void calcDatas(const CosmoEscala *escalas = NULL);
 
     // ellapse in secs
-    inline void Orbita(double ellapse)
+    inline virtual void Orbita(double ellapse)
     {
         angOrbital = fmod(angOrbital + velAngOrbital * ellapse, 2 * M_PI);
         CalcMVP();
@@ -267,7 +286,7 @@ class Planeta : public AstroConOrbita
 public:
     inline Planeta(const SolDataItem *data = NULL) : AstroConOrbita(PLANETA, data) {}
     Planeta(ASTROS_OPTS_SHADERS shader, const char *name, const char *filetex, glm::float32 radius, double ejeMayor, double excentricidad, double peridoOrbital)
-        : AstroConOrbita(shader, name, filetex, radius, ejeMayor, excentricidad, peridoOrbital)
+        : AstroConOrbita(PLANETA, shader, name, filetex, radius, ejeMayor, excentricidad, peridoOrbital)
     {
     }
 
@@ -279,8 +298,13 @@ class Estrella : public Astro
 public:
     inline Estrella(const SolDataItem *data = NULL) : Astro(ESTRELLA, data) {}
     Estrella(ASTROS_OPTS_SHADERS shader, const char *name, const char *filetex, glm::float32 radius, glm::vec3 position)
-        : Astro(shader, name, filetex, radius, position), planetas()
+        : Astro(ESTRELLA, shader, name, filetex, radius, position), planetas()
     {
+    }
+
+    inline const std::vector<Planeta *> &getPlanetas() const
+    {
+        return planetas;
     }
 
     inline void add(Planeta *planeta)
@@ -290,6 +314,25 @@ public:
     }
 
     virtual GLboolean initGL();
+    virtual void calcDatas(const CosmoEscala *escalas = NULL);
+    inline virtual void Orbita(double ellapse)
+    {
+        for (auto planeta = planetas.begin(); planeta != planetas.end(); planeta++)
+        {
+            (*planeta)->Orbita(ellapse);
+        }
+    }
+
+protected:
+    virtual double getDataRadius(const SolDataItem &data) const
+    {
+        return (data.equaRadius != 0) ? data.equaRadius : (data.meanRadius > 0) ? data.meanRadius
+                                                                                : data.polarRadius;
+    }
+    inline virtual const CosmoEscalaItem &getEscalaItemRadius(const CosmoEscala &escalas) const
+    {
+        return escalas.radio_estrella;
+    }
 
 private:
     std::vector<Planeta *> planetas;
@@ -306,6 +349,14 @@ public:
     }
 
     virtual GLboolean initGL();
+    virtual void calcDatas(const CosmoEscala *escalas = NULL);
+    inline virtual void Orbita(double ellapse)
+    {
+        for (auto estrella = estrellas.begin(); estrella != estrellas.end(); estrella++)
+        {
+            (*estrella)->Orbita(ellapse);
+        }
+    }
 
 private:
     std::vector<Estrella *> estrellas;
@@ -316,6 +367,11 @@ class SSolar : public Galaxia
 public:
     inline SSolar() : Galaxia() {}
     inline virtual ~SSolar() {}
+
+    inline Estrella *getSol() const
+    {
+        return sol;
+    }
 
     inline void addSol(Estrella *_sol)
     {

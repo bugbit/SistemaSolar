@@ -79,7 +79,7 @@ static double scaleTime = 1000000.0, lastTime;
 static GLFWwindow *window;
 static Camera camera;
 // static glm::vec3 obsPos(10, 5, 10), obsCenter(0, 0, 0), obsUp(0, 1, 0);
-static glm::vec3 obsPos(50, 5, 50), obsCenter(-50, -5, -50), obsUp(0, 1, 0);
+static glm::vec3 obsPos(700, 25, 25), obsCenter(-700, -25, -35), obsUp(0, 1, 0);
 static ShaderProgram starGLSL;
 static PlanetShaderProgram planetGLSL;
 static OrbitShaderProgram orbitGLSL;
@@ -92,11 +92,19 @@ static GLsizei sphereNumIdxs;
 static double escala1 = 30.0 / (11.2 * 12756.78e3 / 2.0);
 static double escala2 = 350.0 / (590010000e3);
 static double escala3 = 90.0 / (14950300e3);
+const CosmoEscala escalaVistaPlanetaria =
+    {
+        {30.0, 11.2 * 12756.78 / 2.0},
+        {350.0, 590010000},
+        {90.0, 14950300},
+};
 static double radi_terra = (12756.78) / 2.0;
 SSolar *ssolar;
-static Estrella sol(ASTROS_OPTS_SHADERS::Planet, "sol", "2k_sun.jpg", 696000e3 * escala3, glm::vec3(0, 0, 0));
-static Planeta tierra(ASTROS_OPTS_SHADERS::Planet, "tierra", "Tierra2k.jpg", 6378.1e3 * escala1, 149503000e3 * escala2, 0.016, 365.2);
-static Planeta venus(ASTROS_OPTS_SHADERS::Planet, "venus", "2k_venus.jpg", 6051.8e3 * escala1, 108200000e3 * escala2, 0.001, 224.701);
+/*
+static Estrella sol(ASTROS_OPTS_SHADERS::PLANET, "sol", "2k_sun.jpg", 696000e3 * escala3, glm::vec3(0, 0, 0));
+static Planeta tierra(ASTROS_OPTS_SHADERS::PLANET, "tierra", "Tierra2k.jpg", 6378.1e3 * escala1, 149503000e3 * escala2, 0.016, 365.2);
+static Planeta venus(ASTROS_OPTS_SHADERS::PLANET, "venus", "2k_venus.jpg", 6051.8e3 * escala1, 108200000e3 * escala2, 0.001, 224.701);
+*/
 
 static void window_size_callback(GLFWwindow *window, int width, int height);
 static void key_callback(GLFWwindow *window, int key, int scancode, int action, int mods);
@@ -109,9 +117,9 @@ static GLboolean initAstros();
 static void terminate();
 static void terminateGL();
 void main_loop();
-static void displayGL();
-static void displayOrbit(AstroConOrbita &orbit);
-static void displayAstro(Astro &astro);
+// static void displayGL();
+// static void displayOrbit(AstroConOrbita &orbit);
+// static void displayAstro(Astro &astro);
 
 int main(int, char **)
 {
@@ -223,7 +231,7 @@ static void resizeGL()
 static void resizeGL(int width, int height)
 {
     camera.viewport(0, 0, width, height);
-    camera.setProjectionRH(30.0f, width / (float)height, 0.1f, 200.0f);
+    camera.setProjectionRH(30.0f, width / (float)height, 0.1f, 1000.0f);
 }
 
 static GLboolean initGL()
@@ -269,17 +277,23 @@ static GLboolean initGL()
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
-    sol.add(&tierra);
-    sol.add(&venus);
+    /*
+        sol.add(&tierra);
+        sol.add(&venus);
 
-    if (!sol.initGL())
-        return GL_FALSE;
+        tierra.calcDatas();
+        venus.calcDatas();
+        sol.calcDatas();
 
-    if (!tierra.initGL())
-        return GL_FALSE;
+        if (!sol.initGL())
+            return GL_FALSE;
 
-    if (!venus.initGL())
-        return GL_FALSE;
+        if (!tierra.initGL())
+            return GL_FALSE;
+
+        if (!venus.initGL())
+            return GL_FALSE;
+            */
 
     // int i = 0;
     // for (GLfloat *b = orbitBuffer; i < 32; i++)
@@ -386,6 +400,8 @@ static GLboolean loadAstros()
 
     std::cout << "Loaded astros data" << std::endl;
 
+    ssolar->calcDatas(&escalaVistaPlanetaria);
+
     return GL_TRUE;
 }
 
@@ -429,14 +445,98 @@ static void key_callback(GLFWwindow *window, int key, int scancode, int action, 
 #endif
 }
 
+inline void displayOrbit(AstroConOrbita &orbit)
+{
+    // glBindVertexArray(orbitVAO);
+    orbitGLSL.Use();
+    orbitGLSL.setMVP(camera.getProjectionMatrix() * camera.getviewMatrix());
+    orbitGLSL.setCenter((glm::vec3 &)orbit.getCenter());
+    orbitGLSL.setA(orbit.getA());
+    orbitGLSL.setB(orbit.getB());
+    orbitGLSL.setNumVert(32);
+    glDrawArrays(GL_LINE_LOOP, 0, 32);
+}
+
+inline void displayOrbits(Estrella &estrella)
+{
+    auto planetas = estrella.getPlanetas();
+    for (auto planeta = planetas.begin(); planeta != planetas.end(); planeta++)
+    {
+        if ((*planeta)->getShader() != ASTROS_OPTS_SHADERS::AOS_NONE)
+            displayOrbit(**planeta);
+    }
+}
+
+inline void displayPlanet(Astro &astro)
+{
+    astro.getTexture().BindTexture();
+    glBindVertexArray(sphereVAO.getVAO());
+    planetGLSL.Use();
+    planetGLSL.setMVP(camera.getProjectionMatrix() * camera.getviewMatrix() * astro.getModelMatrix());
+    glDrawElements(GL_TRIANGLES, sphereNumIdxs, GL_UNSIGNED_INT, BUFFER_OFFSET(0));
+}
+
+inline void displayAstro(Astro &astro)
+{
+    switch (astro.getShader())
+    {
+    case ASTROS_OPTS_SHADERS::PLANET:
+        displayPlanet(astro);
+        break;
+    }
+}
+
+inline void displayEstrella(Estrella &estrella)
+{
+    displayOrbits(estrella);
+    displayAstro(estrella);
+
+    auto planetas = estrella.getPlanetas();
+
+    for (auto planeta = planetas.begin(); planeta != planetas.end(); planeta++)
+    {
+        displayAstro(**planeta);
+    }
+}
+
+inline void displaySSolar()
+{
+    displayEstrella(*ssolar->getSol());
+}
+
+inline void displayGL()
+{
+    /* Choose background color */
+    // glClearColor(1.0, 0.0, 1.0, 1.0);
+    glClearColor(0, 0, 0, 1.0);
+    glClear(GL_COLOR_BUFFER_BIT);
+
+    camera.lookUp(obsPos, obsCenter, obsUp);
+
+    stars_tex.BindTexture();
+    glBindVertexArray(starsVAO);
+    starGLSL.Use();
+    glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
+
+    /*
+        displayOrbit(tierra);
+        displayOrbit(venus);
+        displayPlanet(sol);
+        displayPlanet(tierra);
+        displayPlanet(venus);
+        */
+    displaySSolar();
+}
+
 void main_loop()
 {
     double _lastTime = glfwGetTime();
     double ellapse = _lastTime - lastTime;
 
     lastTime = _lastTime;
-    tierra.Orbita(ellapse * scaleTime);
-    venus.Orbita(ellapse * scaleTime);
+    // tierra.Orbita(ellapse * scaleTime);
+    // venus.Orbita(ellapse * scaleTime);
+    ssolar->Orbita(ellapse * scaleTime);
 
     displayGL();
 
@@ -466,46 +566,4 @@ void main_loop()
 
     /* Poll for and process events */
     glfwPollEvents();
-}
-
-static void displayGL()
-{
-    /* Choose background color */
-    // glClearColor(1.0, 0.0, 1.0, 1.0);
-    glClearColor(0, 0, 0, 1.0);
-    glClear(GL_COLOR_BUFFER_BIT);
-
-    camera.lookUp(obsPos, obsCenter, obsUp);
-
-    stars_tex.BindTexture();
-    glBindVertexArray(starsVAO);
-    starGLSL.Use();
-    glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
-
-    displayOrbit(tierra);
-    displayOrbit(venus);
-    displayAstro(sol);
-    displayAstro(tierra);
-    displayAstro(venus);
-}
-
-static void displayOrbit(AstroConOrbita &orbit)
-{
-    // glBindVertexArray(orbitVAO);
-    orbitGLSL.Use();
-    orbitGLSL.setMVP(camera.getProjectionMatrix() * camera.getviewMatrix());
-    orbitGLSL.setCenter((glm::vec3 &)orbit.getCenter());
-    orbitGLSL.setA(orbit.getA());
-    orbitGLSL.setB(orbit.getB());
-    orbitGLSL.setNumVert(32);
-    glDrawArrays(GL_LINE_LOOP, 0, 32);
-}
-
-static void displayAstro(Astro &astro)
-{
-    astro.getTexture().BindTexture();
-    glBindVertexArray(sphereVAO.getVAO());
-    planetGLSL.Use();
-    planetGLSL.setMVP(camera.getProjectionMatrix() * camera.getviewMatrix() * astro.getModelMatrix());
-    glDrawElements(GL_TRIANGLES, sphereNumIdxs, GL_UNSIGNED_INT, BUFFER_OFFSET(0));
 }

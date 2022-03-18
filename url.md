@@ -30,6 +30,7 @@ https://stackoverflow.com/questions/64170321/how-to-draw-a-smooth-circle-with-a-
 
 ----- solar -----
 
+https://www.kaggle.com/jaredsavage/solar-system-major-bodies-data
 https://courses.cs.duke.edu/cps124/fall01/projects/solar/
 https://mathweb.ucsd.edu/~sbuss/CourseWeb/Math155A_2019Winter/Project_2/155A_Wi19project2.html
 https://www.big-meter.com/opensource/en/611e436d00a40d704015558d.html
