@@ -79,7 +79,8 @@ static double scaleTime = 1000000.0, lastTime;
 static GLFWwindow *window;
 static Camera camera;
 // static glm::vec3 obsPos(10, 5, 10), obsCenter(0, 0, 0), obsUp(0, 1, 0);
-static glm::vec3 obsPos(700, 25, 25), obsCenter(-700, -25, -35), obsUp(0, 1, 0);
+static glm::vec3 obsPos(100, 25, 25), obsCenter(-100, -25, -35), obsUp(0, 1, 0);
+// static glm::vec3 obsPos(700, 25, 25), obsCenter(-700, -25, -35), obsUp(0, 1, 0);
 static ShaderProgram starGLSL;
 static PlanetShaderProgram planetGLSL;
 static OrbitShaderProgram orbitGLSL;
@@ -365,6 +366,13 @@ static GLboolean loadAstros()
         {
             // es un satélite
             // std::cout << data->eName << " " << data->orbits << " " << std::endl;
+            if (data->orbits == "NA")
+            {
+                // es un asteroide
+                std::cout << data->eName << std::endl;
+            }
+            else if (data->eName == "Moon")
+                ssolar->add(new Satelite(data));
         }
         else if (data->eName == "Sun")
         {
@@ -376,6 +384,8 @@ static GLboolean loadAstros()
             // std::cout << data->eName << std::endl;
         }
     }
+
+    ssolar->fixSatelites();
 
     // Planeta *p = ssolar->getPlaneta("Earth2");
 
@@ -457,17 +467,30 @@ inline void displayOrbit(AstroConOrbita &orbit)
     glDrawArrays(GL_LINE_LOOP, 0, 32);
 }
 
+inline void displayOrbits(Planeta &planeta)
+{
+    displayOrbit(planeta);
+
+    auto satelites = planeta.getSatelites();
+
+    for (auto satelite = satelites.begin(); satelite != satelites.end(); satelite++)
+    {
+        if ((*satelite)->getShader() != ASTROS_OPTS_SHADERS::AOS_NONE)
+            displayOrbit(**satelite);
+    }
+}
+
 inline void displayOrbits(Estrella &estrella)
 {
     auto planetas = estrella.getPlanetas();
     for (auto planeta = planetas.begin(); planeta != planetas.end(); planeta++)
     {
         if ((*planeta)->getShader() != ASTROS_OPTS_SHADERS::AOS_NONE)
-            displayOrbit(**planeta);
+            displayOrbits(**planeta);
     }
 }
 
-inline void displayPlanet(Astro &astro)
+inline void displayShaderPlanet(Astro &astro)
 {
     astro.getTexture().BindTexture();
     glBindVertexArray(sphereVAO.getVAO());
@@ -481,8 +504,20 @@ inline void displayAstro(Astro &astro)
     switch (astro.getShader())
     {
     case ASTROS_OPTS_SHADERS::PLANET:
-        displayPlanet(astro);
+        displayShaderPlanet(astro);
         break;
+    }
+}
+
+inline void displayPlaneta(Planeta &planeta)
+{
+    displayAstro(planeta);
+    auto satelites = planeta.getSatelites();
+
+    for (auto satelite = satelites.begin(); satelite != satelites.end(); satelite++)
+    {
+        if ((*satelite)->getShader() != ASTROS_OPTS_SHADERS::AOS_NONE)
+            displayAstro(**satelite);
     }
 }
 
@@ -495,7 +530,7 @@ inline void displayEstrella(Estrella &estrella)
 
     for (auto planeta = planetas.begin(); planeta != planetas.end(); planeta++)
     {
-        displayAstro(**planeta);
+        displayPlaneta(**planeta);
     }
 }
 

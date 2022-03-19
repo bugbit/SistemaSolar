@@ -1,5 +1,7 @@
 #include "astro.h"
 
+glm::vec3 AstroConOrbita::centerZero;
+
 void Astro::calcDatas(const CosmoEscala *escalas)
 {
     CosmoElemento::calcDatas(escalas);
@@ -51,19 +53,46 @@ void AstroConOrbita::calcDatas(const CosmoEscala *escalas)
         ejeMayor = (escalas) ? escalas->distancia.calc(data->semimajorAxis) : data->semimajorAxis;
         excentricidad = data->eccentricity;
         periodoOrbital = data->sideralOrbit;
+        periodoRotacion = data->sideralRotation;
     }
     a = ejeMayor / 2.0;
     b = ejeMayor * sqrt(1 - 2 * excentricidad) / 2.0;
     c = sqrt(a * a - b * b);
-    if (astroCentro)
-        center = glm::vec3(astroCentro->getPosition().x + c, astroCentro->getPosition().y, astroCentro->getPosition().z);
-    velAngOrbital = 2 * M_PI / (periodoOrbital * 24 * 60 * 60);
+    if (periodoOrbital != 0)
+        velAngOrbital = 2 * M_PI / (periodoOrbital * 24 * 60 * 60);
+    if (periodoRotacion != 0)
+        velAngRotacion = 2 * M_PI / (periodoRotacion * 60 * 60);
     CalcMVP();
 }
 
 void AstroConOrbita::CalcMVP()
 {
-    modelMatrix = glm::translate(center) * glm::translate(glm::vec3(a * sin(angOrbital), 0, b * cos(angOrbital))) * glm::scale(glm::vec3(radius));
+    position = getCenter() + glm::vec3(a * sin(angOrbital), 0, b * cos(angOrbital));
+
+    modelMatrix = glm::translate(position) * glm::scale(glm::vec3(radius)) * glm::rotate(angRotacion, glm::vec3(0, 1, 0));
+}
+
+GLboolean Planeta::initGL()
+{
+    if (!AstroConOrbita::initGL())
+        return GL_FALSE;
+
+    for (auto satelite = satelites.begin(); satelite != satelites.end(); satelite++)
+    {
+        if (!(*satelite)->initGL())
+            return GL_FALSE;
+    }
+
+    return GL_TRUE;
+}
+
+void Planeta::calcDatas(const CosmoEscala *escalas)
+{
+    AstroConOrbita::calcDatas(escalas);
+    for (auto satelite = satelites.begin(); satelite != satelites.end(); satelite++)
+    {
+        (*satelite)->calcDatas(escalas);
+    }
 }
 
 GLboolean Estrella::initGL()
@@ -117,5 +146,17 @@ void Galaxia::calcDatas(const CosmoEscala *escalas)
     for (auto estrella = estrellas.begin(); estrella != estrellas.end(); estrella++)
     {
         (*estrella)->calcDatas(escalas);
+    }
+}
+
+void SSolar::fixSatelites()
+{
+    for (auto msatelite = mapSateliteNames.begin(); msatelite != mapSateliteNames.end(); msatelite++)
+    {
+        Satelite *satelite = msatelite->second;
+        Planeta *planeta = getPlaneta(satelite->getData().orbits);
+
+        if (planeta != NULL)
+            planeta->add(satelite);
     }
 }

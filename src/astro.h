@@ -230,15 +230,15 @@ class AstroConOrbita : public Astro
 {
 public:
     inline AstroConOrbita(COSMOTIPOELEMENTO tipo, const SolDataItem *data = NULL)
-        : Astro(tipo, data), astroCentro(NULL), ejeMayor(0), excentricidad(0), periodoOrbital(0), center(), angOrbital(0) {}
+        : Astro(tipo, data), astroCentro(NULL), ejeMayor(0), excentricidad(0), periodoOrbital(0), periodoRotacion(0), velAngOrbital(0), velAngRotacion(0), angOrbital(0), angRotacion(0) {}
     AstroConOrbita(COSMOTIPOELEMENTO tipo, ASTROS_OPTS_SHADERS shader, const char *name, const char *filetex, glm::float32 radius, double ejeMayor, double excentricidad, double periodoOrbital)
-        : Astro(tipo, shader, name, filetex, radius), astroCentro(NULL), ejeMayor(ejeMayor), excentricidad(excentricidad), periodoOrbital(periodoOrbital), center(), angOrbital(0)
+        : Astro(tipo, shader, name, filetex, radius), astroCentro(NULL), ejeMayor(ejeMayor), excentricidad(excentricidad), periodoOrbital(periodoOrbital), periodoRotacion(0), velAngOrbital(0), velAngRotacion(0), angOrbital(0), angRotacion(0)
     {
     }
 
     inline const glm::vec3 &getCenter() const
     {
-        return center;
+        return (astroCentro) ? astroCentro->getPosition() : centerZero;
     }
 
     inline float getA() const
@@ -263,34 +263,71 @@ public:
     inline virtual void Orbita(double ellapse)
     {
         angOrbital = fmod(angOrbital + velAngOrbital * ellapse, 2 * M_PI);
+        angRotacion = fmod(angRotacion + velAngRotacion * ellapse, 2 * M_PI);
         CalcMVP();
     }
 
 protected:
+    static glm::vec3 centerZero;
     Astro *astroCentro;
     double ejeMayor;
     double excentricidad;
     double a; // ejeMayor/2
     double b; // ejeMenor/2
     double c; // distancia focaL
-    glm::vec3 center;
     float angOrbital;
-    double periodoOrbital; // days
-    double velAngOrbital;  // rad/s
+    float angRotacion;
+    double periodoOrbital;  // days
+    double velAngOrbital;   // rad/s
+    double periodoRotacion; // horas
+    double velAngRotacion;  // rad/s
 
     void CalcMVP();
+};
+
+class Satelite : public AstroConOrbita
+{
+public:
+    inline Satelite(const SolDataItem *data = NULL) : AstroConOrbita(SATELITE, data) {}
+    Satelite(ASTROS_OPTS_SHADERS shader, const char *name, const char *filetex, glm::float32 radius, double ejeMayor, double excentricidad, double peridoOrbital)
+        : AstroConOrbita(SATELITE, shader, name, filetex, radius, ejeMayor, excentricidad, peridoOrbital)
+    {
+    }
 };
 
 class Planeta : public AstroConOrbita
 {
 public:
-    inline Planeta(const SolDataItem *data = NULL) : AstroConOrbita(PLANETA, data) {}
+    inline Planeta(const SolDataItem *data = NULL) : AstroConOrbita(PLANETA, data), satelites() {}
     Planeta(ASTROS_OPTS_SHADERS shader, const char *name, const char *filetex, glm::float32 radius, double ejeMayor, double excentricidad, double peridoOrbital)
-        : AstroConOrbita(PLANETA, shader, name, filetex, radius, ejeMayor, excentricidad, peridoOrbital)
+        : AstroConOrbita(PLANETA, shader, name, filetex, radius, ejeMayor, excentricidad, peridoOrbital), satelites()
     {
     }
 
+    inline const std::vector<Satelite *> &getSatelites() const
+    {
+        return satelites;
+    }
+
+    inline void add(Satelite *satelite)
+    {
+        satelite->setAstroCentro(this);
+        satelites.push_back(satelite);
+    }
+
+    GLboolean initGL();
+    virtual void calcDatas(const CosmoEscala *escalas = NULL);
+    inline virtual void Orbita(double ellapse)
+    {
+        AstroConOrbita::Orbita(ellapse);
+        for (auto satelite = satelites.begin(); satelite != satelites.end(); satelite++)
+        {
+            (*satelite)->Orbita(ellapse);
+        }
+    }
+
 protected:
+    std::vector<Satelite *> satelites;
 };
 
 class Estrella : public Astro
@@ -365,7 +402,7 @@ private:
 class SSolar : public Galaxia
 {
 public:
-    inline SSolar() : Galaxia() {}
+    inline SSolar() : Galaxia(), sol(NULL), mapPlanetaNames(), mapSateliteNames() {}
     inline virtual ~SSolar() {}
 
     inline Estrella *getSol() const
@@ -383,10 +420,19 @@ public:
         mapPlanetaNames[planeta->getData().eName] = planeta;
         sol->add(planeta);
     }
+    inline void add(Satelite *satelite)
+    {
+        mapSateliteNames[satelite->getData().eName] = satelite;
+    }
 
     inline Planeta *getPlaneta(const std::string &name)
     {
         return mapPlanetaNames[name];
+    }
+
+    inline Satelite *getSatelite(const std::string &name)
+    {
+        return mapSateliteNames[name];
     }
 
     inline Astro *getAstro(const std::string &name)
@@ -394,12 +440,20 @@ public:
         if (sol->getData().eName == name)
             return sol;
 
-        return getPlaneta(name);
+        Astro *astro = getPlaneta(name);
+
+        if (astro != NULL)
+            return astro;
+
+        return getSatelite(name);
     }
+
+    void fixSatelites();
 
 private:
     Estrella *sol;
     std::map<std::string, Planeta *> mapPlanetaNames;
+    std::map<std::string, Satelite *> mapSateliteNames;
 };
 
 #endif
