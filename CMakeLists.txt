@@ -29,11 +29,21 @@ target_precompile_headers(ssolar PUBLIC src/pch.h)
     #)
 
 if (EMSCRIPTEN)
+    #TODO(amitp): I don't know how to set this properly with add_compile_options
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -s USE_SDL=2 -s USE_SDL_IMAGE=2")
+    #set(SDL2_LIBRARIES "-s USE_SDL=2")
+    #set(SDL2_IMAGE_LIBRARIES "-s USE_SDL_IMAGE=2")
+    set_target_properties(
+        ssolar
+        PROPERTIES
+        CMAKE_CXX_FLAGS
+        "s USE_GLFW=3 -s USE_WEBGL2=1 -s USE_SDL=2 -s USE_SDL_IMAGE=2 -s SDL2_IMAGE_FORMATS='[\"jpg\"]'"
+    )
     set_target_properties(
         ssolar
         PROPERTIES
         LINK_FLAGS
-        "-s TOTAL_MEMORY=33554432 -s USE_GLFW=3 -s USE_WEBGL2=1 -s USE_SDL=2 -s USE_SDL_IMAGE=2 -s SDL2_IMAGE_FORMATS='[\"jpg\"]' --preload-file ../assets@assets"
+        "-s TOTAL_MEMORY=33554432 -s USE_GLFW=3 -s USE_WEBGL2=1 -s USE_SDL=2 -s USE_SDL_IMAGE=2 -s SDL2_IMAGE_FORMATS='[\"jpg\"]' --preload-file ../../../assets@assets"
     )
 else(EMSCRIPTEN)
     target_link_libraries(ssolar glfw GL GLEW SDL2 SDL2main SDL2_image)    

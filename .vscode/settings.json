@@ -1,4 +1,5 @@
 {
+    "cmake.buildDirectory": "${workspaceRoot}/build/${buildType}/${buildKit}",
     "liveServer.settings.root": "build",
     "files.associations": {
         "iostream": "cpp",
