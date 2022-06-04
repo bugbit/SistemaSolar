@@ -19,14 +19,24 @@ public:
         }
     }
     GLboolean load(const char *filename);
+    GLboolean loadCubeMap(
+        const char *PosXFilename,
+        const char *NegXFilename,
+        const char *PosYFilename,
+        const char *NegYFilename,
+        const char *PosZFilename,
+        const char *NegZFilename);
 
     inline void BindTexture() const
     {
-        glBindTexture(GL_TEXTURE_2D, texture);
+        glBindTexture(target, texture);
     }
 
 private:
+    GLenum target = GL_TEXTURE_2D;
     GLuint texture;
+
+    GLboolean loadCubeMapSide(GLenum side, const char *filename);
 };
 
 #endif

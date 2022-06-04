@@ -1,3 +1,14 @@
+skybox
+
+https://ogldev.org/www/tutorial25/tutorial25.html
+https://webgl2fundamentals.org/webgl/lessons/webgl-skybox.html
+https://gist.github.com/solesensei/2a21cf2a1f7969f6119d166e0bf855d6
+https://www.haroldserrano.com/blog/how-to-apply-a-skybox-in-opengl
+https://gamedev.stackexchange.com/questions/60313/implementing-a-skybox-with-glsl-version-330
+https://learnopengl.com/Advanced-OpenGL/Cubemaps
+
+-----------------------------------
+
 EjeMayor (a), EjeMenor (b) Distancia focal (2c): c => centro al foco
 
 c²=a²-b2

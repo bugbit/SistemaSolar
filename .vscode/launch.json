@@ -5,10 +5,10 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "(gdb) Iniciar",
+            "name": "Debug ssolar (GCC 9.4.0 x86_64-linux-gnu)",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/build/ssolar",
+            "program": "${workspaceFolder}/build/Debug/GCC 9.4.0 x86_64-linux-gnu/ssolar",
             "args": [],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",

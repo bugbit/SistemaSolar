@@ -43,9 +43,14 @@ public:
     layout(location=8) in vec2 in_texcoord;
     */
     GLboolean MakeSolidSphere(float radius, int slices, int stacks, GLsizei &numIndicies);
+    GLboolean MakeSkybox();
 
 protected:
     GLuint vao, *vbos;
+
+private:
+    static GLfloat sky_vertices[];
+    static GLuint sky_indices[];
 };
 
 #endif

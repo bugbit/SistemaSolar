@@ -84,7 +84,7 @@ static glm::vec3 obsPos(100, 25, 25), obsCenter(-100, -25, -35), obsUp(0, 1, 0);
 static ShaderProgram starGLSL;
 static PlanetShaderProgram planetGLSL;
 static OrbitShaderProgram orbitGLSL;
-static Texture2d stars_tex /*, texture*/;
+static Texture2d stars_tex; /*, texture*/
 static GLuint starsVAO;
 // static GLuint orbitVAO;
 // GLfloat orbitBuffer[32 * 3];
@@ -237,8 +237,20 @@ static void resizeGL(int width, int height)
 
 static GLboolean initGL()
 {
-    if (!stars_tex.load("assets/textures/2k_stars+milky_way.jpg"))
+    // if (!stars_tex.load("assets/textures/2k_stars+milky_way.jpg"))
+    //     return GL_FALSE;
+    if (!stars_tex.load("assets/textures/skybox_Front.png"))
         return GL_FALSE;
+    // if (!stars_tex[1].load("assets/textures/skybox_Left.png"))
+    //     return GL_FALSE;
+    // if (!stars_tex[2].load("assets/textures/skybox_Back.png"))
+    //     return GL_FALSE;
+    // if (!stars_tex[3].load("assets/textures/skybox_Right.png"))
+    //     return GL_FALSE;
+    // if (!stars_tex[4].load("assets/textures/skybox_Top.png"))
+    //     return GL_FALSE;
+    // if (!stars_tex[5].load("assets/textures/skybox_Bottom.png"))
+    //     return GL_FALSE;
 
     if (!starGLSL.createProgramFromFile("assets/shaders/stars.vs", "assets/shaders/stars.fs"))
         return GL_FALSE;
@@ -539,6 +551,28 @@ inline void displaySSolar()
     displayEstrella(*ssolar->getSol());
 }
 
+/*
+
+// cuadrado
+inline void displayMilkyway()
+{
+    stars_tex.BindTexture();
+    glBindVertexArray(starsVAO);
+    starGLSL.Use();
+    glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
+}
+
+*/
+
+inline void displayMilkyway()
+{
+    stars_tex.BindTexture();
+    glBindVertexArray(sphereVAO.getVAO());
+    planetGLSL.Use();
+    planetGLSL.setMVP(camera.getProjectionMatrix() * camera.getviewMatrixMilkyway());
+    glDrawElements(GL_TRIANGLES, sphereNumIdxs, GL_UNSIGNED_INT, BUFFER_OFFSET(0));
+}
+
 inline void displayGL()
 {
     /* Choose background color */
@@ -548,18 +582,7 @@ inline void displayGL()
 
     camera.lookUp(obsPos, obsCenter, obsUp);
 
-    stars_tex.BindTexture();
-    glBindVertexArray(starsVAO);
-    starGLSL.Use();
-    glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
-
-    /*
-        displayOrbit(tierra);
-        displayOrbit(venus);
-        displayPlanet(sol);
-        displayPlanet(tierra);
-        displayPlanet(venus);
-        */
+    displayMilkyway();
     displaySSolar();
 }
 

@@ -1,5 +1,29 @@
 #include "vao.h"
 
+GLfloat VAO::sky_vertices[] = {
+    1.0f, 1.0f, 1.0f,
+    1.0f, -1.0f, 1.0f,
+    1.0f, 1.0f, -1.0f,
+    1.0f, -1.0f, -1.0f,
+    -1.0f, -1.0f, -1.0f,
+    -1.0f, 1.0f, -1.0f,
+    -1.0f, -1.0f, 1.0f,
+    -1.0f, 1.0f, 1.0f};
+
+GLuint VAO::sky_indices[] = {
+    0, 1, 3,
+    3, 2, 0,
+    0, 1, 7,
+    7, 6, 1,
+    1, 3, 6,
+    6, 4, 3,
+    3, 2, 4,
+    4, 2, 5,
+    5, 4, 6,
+    6, 5, 7,
+    7, 5, 2,
+    2, 0, 7};
+
 GLboolean VAO::MakeSolidSphere(float radius, int slices, int stacks, GLsizei &numIndicies)
 {
     assert(vao == 0 && vbos == NULL);
@@ -73,6 +97,34 @@ GLboolean VAO::MakeSolidSphere(float radius, int slices, int stacks, GLsizei &nu
     glBindVertexArray(0);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+
+    return GL_TRUE;
+}
+
+GLboolean VAO::MakeSkybox()
+{
+    assert(vao == 0 && vbos == NULL);
+
+    glGenVertexArrays(1, &vao);
+    glBindVertexArray(vao);
+
+    vbos = new GLuint[1];
+    glGenBuffers(1, vbos);
+
+    glBindVertexArray(vao);
+
+    glBindBuffer(GL_ARRAY_BUFFER, *vbos);
+
+    glBufferData(GL_ARRAY_BUFFER, sizeof(sky_vertices), sky_vertices, GL_STATIC_DRAW);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GL_FLOAT), (GLvoid *)0);
+    glEnableVertexAttribArray(0);
+
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, *vbos);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(sky_indices), sky_indices, GL_STATIC_DRAW);
+
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+    glBindVertexArray(0);
 
     return GL_TRUE;
 }
