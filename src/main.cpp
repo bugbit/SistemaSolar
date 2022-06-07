@@ -82,12 +82,15 @@ static Camera camera;
 static glm::vec3 obsPos(100, 25, 25), obsCenter(-100, -25, -35), obsUp(0, 1, 0);
 // static glm::vec3 obsPos(700, 25, 25), obsCenter(-700, -25, -35), obsUp(0, 1, 0);
 static ShaderProgram starGLSL;
+static ShyboxShaderProgram skyboxGLSL;
 static PlanetShaderProgram planetGLSL;
 static OrbitShaderProgram orbitGLSL;
-static Texture2d stars_tex; /*, texture*/
+static Texture2d stars_tex;  /*, texture*/
+static Texture2d skybox_tex; /*, texture*/
 static GLuint starsVAO;
 // static GLuint orbitVAO;
 // GLfloat orbitBuffer[32 * 3];
+static VAO skyboxVAO;
 static VAO sphereVAO;
 static GLsizei sphereNumIdxs;
 static double escala1 = 30.0 / (11.2 * 12756.78e3 / 2.0);
@@ -237,9 +240,12 @@ static void resizeGL(int width, int height)
 
 static GLboolean initGL()
 {
-    // if (!stars_tex.load("assets/textures/2k_stars+milky_way.jpg"))
-    //     return GL_FALSE;
-    if (!stars_tex.load("assets/textures/skybox_Front.png"))
+    if (!stars_tex.load("assets/textures/2k_stars+milky_way.jpg"))
+        return GL_FALSE;
+    if (!skybox_tex.loadCubeMap(
+            "assets/textures/skybox_Right.png", "assets/textures/skybox_Left.png",
+            "assets/textures/skybox_Top.png", "assets/textures/skybox_Bottom.png",
+            "assets/textures/skybox_Back.png", "assets/textures/skybox_Front.png"))
         return GL_FALSE;
     // if (!stars_tex[1].load("assets/textures/skybox_Left.png"))
     //     return GL_FALSE;
@@ -255,6 +261,9 @@ static GLboolean initGL()
     if (!starGLSL.createProgramFromFile("assets/shaders/stars.vs", "assets/shaders/stars.fs"))
         return GL_FALSE;
 
+    if (!skyboxGLSL.createProgramFromFile("assets/shaders/skybox.vs", "assets/shaders/skybox.fs"))
+        return GL_FALSE;
+
     if (!planetGLSL.createProgramFromFile("assets/shaders/planet.vs", "assets/shaders/planet.fs"))
         return GL_FALSE;
 
@@ -263,6 +272,9 @@ static GLboolean initGL()
 
     // if (!orbitGLSL.createProgramFromFile("assets/simple3.vs", "assets/simple3.fs"))
     //     return GL_FALSE;
+
+    if (!skyboxVAO.MakeSkybox())
+        return GL_FALSE;
 
     if (!sphereVAO.MakeSolidSphere(1, 32, 32, sphereNumIdxs))
         return GL_FALSE;
@@ -562,8 +574,7 @@ inline void displayMilkyway()
     glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
 }
 
-*/
-
+// esfera
 inline void displayMilkyway()
 {
     stars_tex.BindTexture();
@@ -571,6 +582,22 @@ inline void displayMilkyway()
     planetGLSL.Use();
     planetGLSL.setMVP(camera.getProjectionMatrix() * camera.getviewMatrixMilkyway());
     glDrawElements(GL_TRIANGLES, sphereNumIdxs, GL_UNSIGNED_INT, BUFFER_OFFSET(0));
+}
+
+*/
+
+inline void displayMilkyway()
+{
+    skybox_tex.BindTexture();
+    glBindVertexArray(sphereVAO.getVAO());
+    skyboxGLSL.Use();
+    // Tell the shader to use texture unit 0 for u_skybox
+    skyboxGLSL.setSkyboxLocation(0);
+    skyboxGLSL.setViewDirectionProjectionInverseLocation(glm::inverse(camera.getProjectionMatrix() * glm::inverse(camera.getviewMatrixMilkyway())));
+    // let our quad pass the depth test at 1.0
+    glDepthFunc(GL_LEQUAL);
+    // glDrawArrays(GL_TRIANGLES, 0, 1 * 6);
+    glDrawElements(GL_TRIANGLES, 1 * 6, GL_UNSIGNED_INT, BUFFER_OFFSET(0));
 }
 
 inline void displayGL()

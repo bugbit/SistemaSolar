@@ -63,10 +63,35 @@ protected:
     }
 };
 
+class ShyboxShaderProgram : public ShaderProgram
+{
+public:
+    inline ShyboxShaderProgram() : ShaderProgram(), SkyboxLocationUniform(-1), ViewDirectionProjectionInverseLocationUniform(-1) {}
+
+    inline void setSkyboxLocation(GLint location)
+    {
+        glUniform1i(SkyboxLocationUniform, location);
+    }
+
+    inline void setViewDirectionProjectionInverseLocation(glm::mat4 mat)
+    {
+        glUniformMatrix4fv(ViewDirectionProjectionInverseLocationUniform, 1, GL_FALSE, glm::value_ptr(mat));
+    }
+
+private:
+    GLint SkyboxLocationUniform, ViewDirectionProjectionInverseLocationUniform;
+
+    inline virtual void initData()
+    {
+        SkyboxLocationUniform = glGetUniformLocation(program, "u_skybox");
+        ViewDirectionProjectionInverseLocationUniform = glGetUniformLocation(program, "u_viewDirectionProjectionInverse");
+    }
+};
+
 class PlanetShaderProgram : public ShaderProgram
 {
 public:
-    PlanetShaderProgram() : ShaderProgram(), MVPUniform(-1)
+    inline PlanetShaderProgram() : ShaderProgram(), MVPUniform(-1)
     {
     }
 
@@ -88,7 +113,7 @@ protected:
 class OrbitShaderProgram : public ShaderProgram
 {
 public:
-    OrbitShaderProgram() : ShaderProgram(), centerUniform(-1), aUniform(-1), bUniform(-1), numVertUniform(-1)
+    inline OrbitShaderProgram() : ShaderProgram(), centerUniform(-1), aUniform(-1), bUniform(-1), numVertUniform(-1)
     {
     }
 

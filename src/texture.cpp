@@ -58,6 +58,14 @@ GLboolean Texture2d::load(const char *filename)
     return GL_TRUE;
 }
 
+/*
+GL_TEXTURE_CUBE_MAP_POSITIVE_X	Right
+GL_TEXTURE_CUBE_MAP_NEGATIVE_X	Left
+GL_TEXTURE_CUBE_MAP_POSITIVE_Y	Top
+GL_TEXTURE_CUBE_MAP_NEGATIVE_Y	Bottom
+GL_TEXTURE_CUBE_MAP_POSITIVE_Z	Back
+GL_TEXTURE_CUBE_MAP_NEGATIVE_Z	Front
+*/
 GLboolean Texture2d::loadCubeMap(
     const char *PosXFilename,
     const char *NegXFilename,
