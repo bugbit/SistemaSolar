@@ -9,6 +9,13 @@ https://learnopengl.com/Advanced-OpenGL/Cubemaps
 
 -----------------------------------
 
+OpenGL
+http://www.opengl-tutorial.org/es/beginners-tutorials/tutorial-6-keyboard-and-mouse/
+http://acodigo.blogspot.com/2016/04/tutorial-opengl-camara.html
+
+
+---------
+
 EjeMayor (a), EjeMenor (b) Distancia focal (2c): c => centro al foco
 
 c²=a²-b2

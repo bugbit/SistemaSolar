@@ -81,13 +81,13 @@ static Camera camera;
 // static glm::vec3 obsPos(10, 5, 10), obsCenter(0, 0, 0), obsUp(0, 1, 0);
 static glm::vec3 obsPos(100, 25, 25), obsCenter(-100, -25, -35), obsUp(0, 1, 0);
 // static glm::vec3 obsPos(700, 25, 25), obsCenter(-700, -25, -35), obsUp(0, 1, 0);
-static ShaderProgram starGLSL;
+//static ShaderProgram starGLSL;
 static ShyboxShaderProgram skyboxGLSL;
 static PlanetShaderProgram planetGLSL;
 static OrbitShaderProgram orbitGLSL;
-static Texture2d stars_tex;  /*, texture*/
+//static Texture2d stars_tex;  /*, texture*/
 static Texture2d skybox_tex; /*, texture*/
-static GLuint starsVAO;
+//static GLuint starsVAO;
 // static GLuint orbitVAO;
 // GLfloat orbitBuffer[32 * 3];
 static VAO skyboxVAO;
@@ -240,8 +240,8 @@ static void resizeGL(int width, int height)
 
 static GLboolean initGL()
 {
-    if (!stars_tex.load("assets/textures/2k_stars+milky_way.jpg"))
-        return GL_FALSE;
+    // if (!stars_tex.load("assets/textures/2k_stars+milky_way.jpg"))
+    //     return GL_FALSE;
     if (!skybox_tex.loadCubeMap(
             "assets/textures/skybox_Right.png", "assets/textures/skybox_Left.png",
             "assets/textures/skybox_Top.png", "assets/textures/skybox_Bottom.png",
@@ -258,8 +258,8 @@ static GLboolean initGL()
     // if (!stars_tex[5].load("assets/textures/skybox_Bottom.png"))
     //     return GL_FALSE;
 
-    if (!starGLSL.createProgramFromFile("assets/shaders/stars.vs", "assets/shaders/stars.fs"))
-        return GL_FALSE;
+    // if (!starGLSL.createProgramFromFile("assets/shaders/stars.vs", "assets/shaders/stars.fs"))
+    //     return GL_FALSE;
 
     if (!skyboxGLSL.createProgramFromFile("assets/shaders/skybox.vs", "assets/shaders/skybox.fs"))
         return GL_FALSE;
@@ -279,28 +279,28 @@ static GLboolean initGL()
     if (!sphereVAO.MakeSolidSphere(1, 32, 32, sphereNumIdxs))
         return GL_FALSE;
 
-    GLuint vao;
-    glGenVertexArrays(1, &vao);
-    glBindVertexArray(vao);
+    // GLuint vao;
+    // glGenVertexArrays(1, &vao);
+    // glBindVertexArray(vao);
 
-    GLuint vbos[3];
-    glGenBuffers(3, vbos);
+    // GLuint vbos[3];
+    // glGenBuffers(3, vbos);
 
-    glBindBuffer(GL_ARRAY_BUFFER, vbos[0]);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(stars_pos), stars_pos, GL_STATIC_DRAW);
-    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 0, BUFFER_OFFSET(0));
-    glEnableVertexAttribArray(0);
+    // glBindBuffer(GL_ARRAY_BUFFER, vbos[0]);
+    // glBufferData(GL_ARRAY_BUFFER, sizeof(stars_pos), stars_pos, GL_STATIC_DRAW);
+    // glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 0, BUFFER_OFFSET(0));
+    // glEnableVertexAttribArray(0);
 
-    glBindBuffer(GL_ARRAY_BUFFER, vbos[1]);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(stars_uv), stars_uv, GL_STATIC_DRAW);
-    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 0, BUFFER_OFFSET(0));
-    glEnableVertexAttribArray(1);
+    // glBindBuffer(GL_ARRAY_BUFFER, vbos[1]);
+    // glBufferData(GL_ARRAY_BUFFER, sizeof(stars_uv), stars_uv, GL_STATIC_DRAW);
+    // glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 0, BUFFER_OFFSET(0));
+    // glEnableVertexAttribArray(1);
 
-    starsVAO = vao;
+    // starsVAO = vao;
 
-    glBindVertexArray(0);
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+    // glBindVertexArray(0);
+    // glBindBuffer(GL_ARRAY_BUFFER, 0);
+    // glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
     /*
         sol.add(&tierra);
@@ -589,15 +589,15 @@ inline void displayMilkyway()
 inline void displayMilkyway()
 {
     skybox_tex.BindTexture();
-    glBindVertexArray(sphereVAO.getVAO());
+    glBindVertexArray(skyboxVAO.getVAO());
     skyboxGLSL.Use();
     // Tell the shader to use texture unit 0 for u_skybox
     skyboxGLSL.setSkyboxLocation(0);
     skyboxGLSL.setViewDirectionProjectionInverseLocation(glm::inverse(camera.getProjectionMatrix() * glm::inverse(camera.getviewMatrixMilkyway())));
     // let our quad pass the depth test at 1.0
     glDepthFunc(GL_LEQUAL);
-    // glDrawArrays(GL_TRIANGLES, 0, 1 * 6);
-    glDrawElements(GL_TRIANGLES, 1 * 6, GL_UNSIGNED_INT, BUFFER_OFFSET(0));
+    glDrawArrays(GL_TRIANGLES, 0, 1 * 6);
+    // glDrawElements(GL_TRIANGLES, 1 * 6, GL_UNSIGNED_INT, BUFFER_OFFSET(0));
 }
 
 inline void displayGL()
