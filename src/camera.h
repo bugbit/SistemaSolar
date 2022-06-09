@@ -5,7 +5,7 @@
 class Camera
 {
 public:
-    inline Camera() : viewMatrix(1), projectionMatrix(1), viewMatrixMilkyway(1)
+    inline Camera() : viewMatrix(1), projectionMatrix(1), viewMatrixMilkyway(1), position(), front()
     {
     }
     inline glm::mat4 getProjectionMatrix() const
@@ -30,6 +30,8 @@ public:
     }
     inline void lookUp(glm::vec3 eye, glm::vec3 center, glm::vec3 up)
     {
+        position = eye;
+        front = center - eye;
         viewMatrix = glm::lookAt(eye, center, up);
     }
 
@@ -37,6 +39,9 @@ private:
     glm::mat4 projectionMatrix;
     glm::mat4 viewMatrix;
     glm::mat4 viewMatrixMilkyway;
+
+    glm::vec3 position;
+    glm::vec3 front;
 
     // falta angulos
     /*

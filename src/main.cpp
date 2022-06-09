@@ -80,16 +80,17 @@ static GLFWwindow *window;
 static Camera camera;
 // static glm::vec3 obsPos(10, 5, 10), obsCenter(0, 0, 0), obsUp(0, 1, 0);
 static glm::vec3 obsPos(100, 25, 25), obsCenter(-100, -25, -35), obsUp(0, 1, 0);
+static glm::vec3 obsFront = obsCenter - obsPos;
 // static glm::vec3 obsPos(700, 25, 25), obsCenter(-700, -25, -35), obsUp(0, 1, 0);
-//static ShaderProgram starGLSL;
+// static ShaderProgram starGLSL;
 static ShyboxShaderProgram skyboxGLSL;
 static PlanetShaderProgram planetGLSL;
 static OrbitShaderProgram orbitGLSL;
-//static Texture2d stars_tex;  /*, texture*/
+// static Texture2d stars_tex;  /*, texture*/
 static Texture2d skybox_tex; /*, texture*/
-//static GLuint starsVAO;
-// static GLuint orbitVAO;
-// GLfloat orbitBuffer[32 * 3];
+// static GLuint starsVAO;
+//  static GLuint orbitVAO;
+//  GLfloat orbitBuffer[32 * 3];
 static VAO skyboxVAO;
 static VAO sphereVAO;
 static GLsizei sphereNumIdxs;
