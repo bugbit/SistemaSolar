@@ -80,7 +80,6 @@ static GLFWwindow *window;
 static Camera camera;
 // static glm::vec3 obsPos(10, 5, 10), obsCenter(0, 0, 0), obsUp(0, 1, 0);
 static glm::vec3 obsPos(100, 25, 25), obsCenter(-100, -25, -35), obsUp(0, 1, 0);
-static glm::vec3 obsFront = obsCenter - obsPos;
 // static glm::vec3 obsPos(700, 25, 25), obsCenter(-700, -25, -35), obsUp(0, 1, 0);
 // static ShaderProgram starGLSL;
 static ShyboxShaderProgram skyboxGLSL;
@@ -594,7 +593,7 @@ inline void displayMilkyway()
     skyboxGLSL.Use();
     // Tell the shader to use texture unit 0 for u_skybox
     skyboxGLSL.setSkyboxLocation(0);
-    skyboxGLSL.setViewDirectionProjectionInverseLocation(glm::inverse(camera.getProjectionMatrix() * glm::inverse(camera.getviewMatrixMilkyway())));
+    skyboxGLSL.setViewDirectionProjectionInverseLocation(glm::inverse(camera.getProjectionMatrix() * camera.getviewMatrixMilkywayInverse()));
     // let our quad pass the depth test at 1.0
     glDepthFunc(GL_LEQUAL);
     glDrawArrays(GL_TRIANGLES, 0, 1 * 6);

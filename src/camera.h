@@ -5,7 +5,7 @@
 class Camera
 {
 public:
-    inline Camera() : viewMatrix(1), projectionMatrix(1), viewMatrixMilkyway(1), position(), front()
+    inline Camera() : viewMatrix(1), projectionMatrix(1), viewMatrixMilkyway(1), viewMatrixMilkywayInverse(), position(), center(), radius(0), elevation(0), azimuth(0)
     {
     }
     inline glm::mat4 getProjectionMatrix() const
@@ -20,6 +20,10 @@ public:
     {
         return viewMatrixMilkyway;
     }
+    inline glm::mat4 getviewMatrixMilkywayInverse() const
+    {
+        return viewMatrixMilkywayInverse;
+    }
     inline void viewport(int x, int y, int width, int height)
     {
         glViewport(x, y, width, height);
@@ -31,17 +35,36 @@ public:
     inline void lookUp(glm::vec3 eye, glm::vec3 center, glm::vec3 up)
     {
         position = eye;
-        front = center - eye;
+        center = center;
         viewMatrix = glm::lookAt(eye, center, up);
+        updateViewMilkyway();
+    }
+
+    inline void updateView()
+    {
+        updateViewMilkyway();
+    }
+
+    inline void updateViewMilkyway()
+    {
+        viewMatrixMilkyway = glm::mat4(1);
+        viewMatrixMilkyway = glm::rotate(viewMatrixMilkyway, glm::radians(elevation), glm::vec3(1, 0, 0));
+        viewMatrixMilkyway = glm::rotate(viewMatrixMilkyway, glm::radians(-azimuth), glm::vec3(0, 1, 0));
+        viewMatrixMilkywayInverse = glm::inverse(viewMatrixMilkyway);
     }
 
 private:
     glm::mat4 projectionMatrix;
     glm::mat4 viewMatrix;
     glm::mat4 viewMatrixMilkyway;
+    glm::mat4 viewMatrixMilkywayInverse;
 
     glm::vec3 position;
-    glm::vec3 front;
+    glm::vec3 center;
+    // polar
+    float radius;
+    float elevation;
+    float azimuth;
 
     // falta angulos
     /*
