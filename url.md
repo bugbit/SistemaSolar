@@ -16,6 +16,19 @@ http://acodigo.blogspot.com/2016/04/tutorial-opengl-camara.html
 
 ---------
 
+Diameters is: 10’000 km (reality) = 1m 
+positions is : 1 million km (reality) = 1m (in Unity)* 
+*except for the first 4 planets where we scaled them each with a different factor so they don’t end up too close to the sun. 
+Mercury: 58*3 (the real distance being of 58 million km)
+Venus: 108*2
+Earth: 149.5*2
+Mars: 227.8*1.5
+Jupiter: 778.5
+Saturn: 1433
+Uranus: 2900
+Neptune: 4500
+
+
 EjeMayor (a), EjeMenor (b) Distancia focal (2c): c => centro al foco
 
 c²=a²-b2

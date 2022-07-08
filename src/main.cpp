@@ -78,9 +78,14 @@ static int wwwidth, wwheight, wwrefreshrate;
 static double scaleTime = 1000000.0, lastTime;
 static GLFWwindow *window;
 static Camera camera;
+// static const GLfloat fov=30.0f;
+static GLfloat fov = 30.0f;
 // static glm::vec3 obsPos(10, 5, 10), obsCenter(0, 0, 0), obsUp(0, 1, 0);
-static glm::vec3 obsPos(100, 25, 25), obsCenter(-100, -25, -35), obsUp(0, 1, 0);
+// antes
+// static glm::vec3 obsPos(100, 25, 25), obsCenter(-100, -25, -35), obsUp(0, 1, 0);
 // static glm::vec3 obsPos(700, 25, 25), obsCenter(-700, -25, -35), obsUp(0, 1, 0);
+glm::vec3 obsPos(0, 250, 250), obsCenter(0, 0, 0), obsUp(0, 1, 0), obsFront = glm::vec3(0.0f, 0.0f, -1.0f);
+GLfloat obsSpeed = 10;
 // static ShaderProgram starGLSL;
 static ShyboxShaderProgram skyboxGLSL;
 static PlanetShaderProgram planetGLSL;
@@ -93,14 +98,21 @@ static Texture2d skybox_tex; /*, texture*/
 static VAO skyboxVAO;
 static VAO sphereVAO;
 static GLsizei sphereNumIdxs;
+/*
+Diameters is: 10’000 km (reality) = 1m
+positions is : 1 million km (reality) = 1m (in Unity)*
+*/
 static double escala1 = 30.0 / (11.2 * 12756.78e3 / 2.0);
 static double escala2 = 350.0 / (590010000e3);
 static double escala3 = 90.0 / (14950300e3);
 const CosmoEscala escalaVistaPlanetaria =
     {
-        {30.0, 11.2 * 12756.78 / 2.0},
-        {350.0, 590010000},
-        {90.0, 14950300},
+        //{30.0, 11.2 * 12756.78 / 2.0},
+        {1, 10000},
+        //{350.0, 590010000},
+        {1, 1000000},
+        //{90.0, 14950300},
+        {1, 100000},
 };
 static double radi_terra = (12756.78) / 2.0;
 SSolar *ssolar;
@@ -235,7 +247,7 @@ static void resizeGL()
 static void resizeGL(int width, int height)
 {
     camera.viewport(0, 0, width, height);
-    camera.setProjectionRH(30.0f, width / (float)height, 0.1f, 1000.0f);
+    camera.setProjectionRH(fov, width / (float)height, 0.1f, 10000.0f);
 }
 
 static GLboolean initGL()
@@ -459,8 +471,16 @@ static void key_callback(GLFWwindow *window, int key, int scancode, int action, 
 {
     if (key == GLFW_KEY_X && action == GLFW_PRESS)
         glfwSetWindowShouldClose(window, GLFW_TRUE);
+    if (key == GLFW_KEY_W)
+        obsPos += obsSpeed * obsFront;
+    if (key == GLFW_KEY_S)
+        obsPos -= obsSpeed * obsFront;
+    if (key == GLFW_KEY_A)
+        obsPos -= glm::normalize(glm::cross(obsFront, obsUp)) * obsSpeed;
+    if (key == GLFW_KEY_D)
+        obsPos += glm::normalize(glm::cross(obsFront, obsUp)) * obsSpeed;
 #ifndef __EMSCRIPTEN__
-    if (key == GLFW_KEY_F && action == GLFW_PRESS)
+    else if (key == GLFW_KEY_F && action == GLFW_PRESS)
     {
         GLFWmonitor *monitor = glfwGetPrimaryMonitor();
         const GLFWvidmode *mode = glfwGetVideoMode(monitor);
@@ -607,6 +627,7 @@ inline void displayGL()
     glClearColor(0, 0, 0, 1.0);
     glClear(GL_COLOR_BUFFER_BIT);
 
+    camera.setProjectionRH(fov, wwidth / (float)wheight, 0.1f, 10000.0f);
     camera.lookUp(obsPos, obsCenter, obsUp);
 
     displayMilkyway();
