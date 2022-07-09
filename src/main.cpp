@@ -77,7 +77,7 @@ static int wwidth = 800, wheight = 600;
 static int wwwidth, wwheight, wwrefreshrate;
 static double scaleTime = 1000000.0, lastTime;
 static GLFWwindow *window;
-static Camera camera;
+static Camera *camera;
 // static const GLfloat fov=30.0f;
 static GLfloat fov = 30.0f;
 // static glm::vec3 obsPos(10, 5, 10), obsCenter(0, 0, 0), obsUp(0, 1, 0);
@@ -144,6 +144,8 @@ int main(int, char **)
     const char *description;
 #endif
 
+    camera = new CameraPolar();
+
     /* Initialize the library */
     if (!glfwInit())
     {
@@ -153,6 +155,11 @@ int main(int, char **)
 #else
         printf("glfwInit error,");
 #endif
+        if (camera)
+        {
+            delete camera;
+            camera = NULL;
+        }
 
         return EXIT_FAILURE;
     }
@@ -173,6 +180,11 @@ int main(int, char **)
         printf("glfwInit error,");
 #endif
 
+        if (camera)
+        {
+            delete camera;
+            camera = NULL;
+        }
         glfwTerminate();
 
         return EXIT_FAILURE;
@@ -188,6 +200,11 @@ int main(int, char **)
         /* Problem: glewInit failed, something is seriously wrong. */
         fprintf(stderr, "Error: %s\n", glewGetErrorString(err));
 
+        if (camera)
+        {
+            delete camera;
+            camera = NULL;
+        }
         glfwTerminate();
 
         return EXIT_FAILURE;
@@ -246,8 +263,8 @@ static void resizeGL()
 
 static void resizeGL(int width, int height)
 {
-    camera.viewport(0, 0, width, height);
-    camera.setProjectionRH(fov, width / (float)height, 0.1f, 10000.0f);
+    camera->viewport(0, 0, width, height);
+    camera->setProjectionRH(fov, width / (float)height, 0.1f, 10000.0f);
 }
 
 static GLboolean initGL()
@@ -465,6 +482,11 @@ static void terminate()
         ssolar = NULL;
     }
     glfwTerminate();
+    if (camera)
+    {
+        delete camera;
+        camera = NULL;
+    }
 }
 
 static void key_callback(GLFWwindow *window, int key, int scancode, int action, int mods)
@@ -503,7 +525,7 @@ inline void displayOrbit(AstroConOrbita &orbit)
 {
     // glBindVertexArray(orbitVAO);
     orbitGLSL.Use();
-    orbitGLSL.setMVP(camera.getProjectionMatrix() * camera.getviewMatrix());
+    orbitGLSL.setMVP(camera->getProjectionMatrix() * camera->getviewMatrix());
     orbitGLSL.setCenter((glm::vec3 &)orbit.getCenter());
     orbitGLSL.setA(orbit.getA());
     orbitGLSL.setB(orbit.getB());
@@ -539,7 +561,7 @@ inline void displayShaderPlanet(Astro &astro)
     astro.getTexture().BindTexture();
     glBindVertexArray(sphereVAO.getVAO());
     planetGLSL.Use();
-    planetGLSL.setMVP(camera.getProjectionMatrix() * camera.getviewMatrix() * astro.getModelMatrix());
+    planetGLSL.setMVP(camera->getProjectionMatrix() * camera->getviewMatrix() * astro.getModelMatrix());
     glDrawElements(GL_TRIANGLES, sphereNumIdxs, GL_UNSIGNED_INT, BUFFER_OFFSET(0));
 }
 
@@ -613,7 +635,7 @@ inline void displayMilkyway()
     skyboxGLSL.Use();
     // Tell the shader to use texture unit 0 for u_skybox
     skyboxGLSL.setSkyboxLocation(0);
-    skyboxGLSL.setViewDirectionProjectionInverseLocation(glm::inverse(camera.getProjectionMatrix() * camera.getviewMatrixMilkywayInverse()));
+    skyboxGLSL.setViewDirectionProjectionInverseLocation(glm::inverse(camera->getProjectionMatrix() * camera->getviewMatrixMilkywayInverse()));
     // let our quad pass the depth test at 1.0
     glDepthFunc(GL_LEQUAL);
     glDrawArrays(GL_TRIANGLES, 0, 1 * 6);
@@ -627,8 +649,8 @@ inline void displayGL()
     glClearColor(0, 0, 0, 1.0);
     glClear(GL_COLOR_BUFFER_BIT);
 
-    camera.setProjectionRH(fov, wwidth / (float)wheight, 0.1f, 10000.0f);
-    camera.lookUp(obsPos, obsCenter, obsUp);
+    camera->setProjectionRH(fov, wwidth / (float)wheight, 0.1f, 10000.0f);
+    camera->lookUp(obsPos, obsCenter, obsUp);
 
     displayMilkyway();
     displaySSolar();

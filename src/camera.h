@@ -5,9 +5,8 @@
 class Camera
 {
 public:
-    inline Camera() : viewMatrix(1), projectionMatrix(1), viewMatrixMilkyway(1), viewMatrixMilkywayInverse(), position(), center(), radius(0), elevation(0), azimuth(0)
-    {
-    }
+    inline Camera() : viewMatrix(1), projectionMatrix(1), viewMatrixMilkyway(1), viewMatrixMilkywayInverse(), position(), center() {}
+
     inline glm::mat4 getProjectionMatrix() const
     {
         return projectionMatrix;
@@ -40,12 +39,42 @@ public:
         updateViewMilkyway();
     }
 
+    inline virtual void updateViewMilkyway()
+    {
+        viewMatrixMilkyway = glm::mat4(1);
+        viewMatrixMilkywayInverse = glm::inverse(viewMatrixMilkyway);
+    }
+
+protected:
+    glm::mat4 projectionMatrix;
+    glm::mat4 viewMatrix;
+    glm::mat4 viewMatrixMilkyway;
+    glm::mat4 viewMatrixMilkywayInverse;
+
+    glm::vec3 position;
+    glm::vec3 center;
+};
+
+class CameraPolar : public Camera
+{
+public:
+    inline CameraPolar() : Camera(), radius(0), elevation(0), azimuth(0)
+    {
+    }
+
     inline void updateView()
     {
+        viewMatrix = glm::mat4(1);
+        viewMatrix = glm::translate(viewMatrix, center);
+        viewMatrix = glm::rotate(viewMatrix, glm::radians(azimuth), glm::vec3(0, 1, 0));
+        viewMatrix = glm::rotate(viewMatrix, glm::radians(-elevation), glm::vec3(1, 0, 0));
+        viewMatrix = glm::translate(viewMatrix, glm::vec3(0, 0, radius));
+
+        position = glm::vec3(viewMatrix * glm::vec4(0, 0, 0, 1)) + center;
         updateViewMilkyway();
     }
 
-    inline void updateViewMilkyway()
+    inline virtual void updateViewMilkyway()
     {
         viewMatrixMilkyway = glm::mat4(1);
         viewMatrixMilkyway = glm::rotate(viewMatrixMilkyway, glm::radians(elevation), glm::vec3(1, 0, 0));
@@ -54,13 +83,6 @@ public:
     }
 
 private:
-    glm::mat4 projectionMatrix;
-    glm::mat4 viewMatrix;
-    glm::mat4 viewMatrixMilkyway;
-    glm::mat4 viewMatrixMilkywayInverse;
-
-    glm::vec3 position;
-    glm::vec3 center;
     // polar
     float radius;
     float elevation;
